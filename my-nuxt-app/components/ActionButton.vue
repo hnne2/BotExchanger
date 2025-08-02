@@ -1,16 +1,24 @@
 <template>
   <NuxtLink
       :to="to"
-      class="flex flex-col items-center justify-center bg-[#1F1B23] rounded-2xl p-4 text-center hover:bg-[#2a242e] transition-all"
+      class="no-underline flex flex-col items-center justify-start gap-3 bg-[#120E14A8] [border-radius:8px] px-4 py-4 text-center hover:bg-[#2a242e] transition-all text-[#F5F5F5]"
   >
-    <div class="text-3xl mb-2">{{ icon }}</div>
-    <div class="text-sm font-medium">{{ label }}</div>
+    <img
+        :src="icon"
+        alt="icon"
+        class="w-10 h-10 mb-2 object-contain"
+    />
+    <div class="text-[15px] font-semibold text-center leading-[140%] tracking-normal">{{ label }}</div>
   </NuxtLink>
 </template>
 
+
 <script setup>
 defineProps({
-  icon: String,
+  icon: {
+    type: String,
+    required: true // путь к изображению
+  },
   label: String,
   to: {
     type: String,

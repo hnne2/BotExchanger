@@ -81,7 +81,7 @@ const submitForm = () => {
   padding: 3rem 1rem 5rem;
   background-image: url('/img/lines-bg.svg');
   background-repeat: no-repeat;
-  background-position: 100px center;
+  background-position: center;
   background-size: contain;
 }
 
