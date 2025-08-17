@@ -1,7 +1,7 @@
 <template>
   <div class="relative"> <!-- Обертка для градиентного перехода -->
-    <header class="app-header bg-gradient-to-b from-[#231F25] to-[#2d2830]">
-      <button class="menu-btn" @click="$emit('toggle-menu')">
+    <header class="app-header bg-gradient-to-b from-[#231F25] to-[#2d2830] ">
+      <button class="menu-btn ml-[20px]" @click="$emit('toggle-menu')">
         <img src="/img/menu.svg" alt="Меню" class="icon" />
       </button>
 
@@ -10,7 +10,7 @@
         <img v-else src="/img/header_criptogex.svg" alt="Crypto Gex" class="logo" />
       </div>
 
-      <button class="notify-btn">
+      <button class="notify-btn mr-[20px]">
         <img src="/img/notifi.svg" alt="Уведомления" class="icon" />
       </button>
     </header>

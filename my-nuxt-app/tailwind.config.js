@@ -17,3 +17,12 @@ module.exports = {
     },
     plugins: [],
 }
+export default {
+    theme: {
+        extend: {
+            fontFamily: {
+                vela: ['"Vela Sans"', 'sans-serif'],
+            },
+        },
+    },
+}

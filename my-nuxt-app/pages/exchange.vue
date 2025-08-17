@@ -1,82 +1,209 @@
 <template>
-  <div class="exchange-page">
-    <!-- header/menu -->
-    <header class="header">
-      <NuxtLink to="/" class="logo">Моно</NuxtLink>
-      <h1>Купить / Продать</h1>
-    </header>
+  <div class="exchange-page bg-[#231F25] min-h-screen text-[#F5F5F5]">
+    <div class="mx-[1rem]">
+      <!-- переключатели Buy/Sell -->
+      <div>
+        <RequestConfirmation
+            v-if="isSuccess"
+            :request-number="requestNumber"
+            @create-another="resetForm"
+            @go-to-my-requests="$router.push('/my-requests')"
+        />
+        <form v-else @submit.prevent="submit">
+          <AppHeader title="Купить/Продажа" />
 
-    <!-- переключатели Buy/Sell -->
-    <div class="toggle-group">
-      <button
-          :class="{ active: mode === 'buy' }"
-          @click="mode = 'buy'"
-      >Купить</button>
-      <button
-          :class="{ active: mode === 'sell' }"
-          @click="mode = 'sell'"
-      >Продать</button>
+          <div class="toggle-group  mt-[1rem]">
+            <button
+                :class="{ active: mode === 'buy' }"
+                @click="mode = 'buy'"
+            >Купить</button>
+            <button
+                :class="{ active: mode === 'sell' }"
+                @click="mode = 'sell'"
+            >Продать</button>
+          </div>
+        <div class="form-group my-[13px]">
+          <select
+              v-model="form.type"
+              class="h-[40px]  w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-[20px] appearance-none focus:outline-none"
+          >
+            <option disabled value="">Город</option>
+            <option v-for="t in types" :key="t.value" :value="t.value">
+              {{ t.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group my-[13px]">
+          <select
+              v-model="form.type"
+              class="h-[40px] w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md appearance-none focus:outline-none"
+          >
+            <option disabled value="">Адрес обменника</option>
+            <option v-for="t in types" :key="t.value" :value="t.value">
+              {{ t.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group my-[13px]">
+          <select
+              v-model="form.type"
+              class="h-[40px] w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md appearance-none focus:outline-none"
+          >
+            <option disabled value="">Тип заявки</option>
+            <option v-for="t in types" :key="t.value" :value="t.value">
+              {{ t.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="bg-[#18141a] rounded-[12px] px-[16px] pt-[16px] pb-[24px] l text-[#F5F5F5] text-[14px] font-inter">
+          <!-- Верхняя строка -->
+          <div class="flex justify-between items-center mb-[12px]">
+            <span class="text-[#F4B44D] font-medium text-[13px]">Отдаю</span>
+            <span class="text-[#AAAAAA] text-[12px]">1 RUB = 0,12345678 USDT</span>
+          </div>
+
+          <!-- Поле ввода + select -->
+          <div class="flex items-center gap-[8px]">
+            <input type="number" placeholder="0"
+                   class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#F5F5F5] placeholder-[#F5F5F5] text-[15px] outline-none w-full" />
+            <div class="relative">
+              <select
+                  class="bg-[#231F25] text-[#F5F5F5] text-[14px] pr-[32px] pl-[14px] py-[12px] rounded-[8px] appearance-none outline-none border-none">
+                <option>RUB</option>
+                <option>USD</option>
+                <option>EUR</option>
+              </select>
+              <!-- Иконка стрелки -->
+              <div class="pointer-events-none absolute right-[12px] top-1/2 -translate-y-1/2">
+                <svg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1L6 5L11 1" stroke="white" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Метка "Получаю" -->
+          <div class="text-[#F4B44D] font-medium text-[13px] mt-[20px] mb-[12px]">
+            Получаю
+          </div>
+
+
+          <div class="flex items-center gap-[8px]">
+            <input
+                type="number"
+                placeholder="0"
+                class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#F5F5F5] placeholder-[#F5F5F5] text-[15px] outline-none w-full"
+            />
+            <div
+                class="min-w-[48px] bg-[#231F25] text-[#F5F5F5] text-[14px] px-[14px] py-[12px] rounded-[8px] text-center border-none">
+              UZDT
+            </div>
+          </div>
+
+        </div>
+        <div class="flex items-center  my-[20px] [gap:5px]">
+          <input
+              v-model="wallet"
+              type="text"
+              placeholder="Кошелек TRC-20"
+              class="flex-1 bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-[8px] [padding-left:16px] [padding-right:16px] [padding-top:13px] [padding-bottom:13px] outline-none"
+          />
+          <button
+              @click="pasteFromClipboard"
+              class="bg-transparent border-none outline-none hover:bg-[#e0a73f] text-[#1a171d]  rounded-[15px]"
+          >
+            <!-- Иконка clipboard -->
+            <img src="/img/copy_button.svg" alt="вставить">
+          </button>
+        </div>
+
+        <div class=" flex form-group my-[13px]  ">
+          <input
+              v-model="form.type"
+              type="text"
+              placeholder="Фамилия"
+              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+          />
+        </div>
+
+        <div class=" flex form-group my-[13px]  ">
+          <input
+              v-model="form.type"
+              type="text"
+              placeholder="Имя"
+              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+          />
+        </div>
+
+        <div class=" flex form-group my-[13px]  ">
+          <input
+              v-model="form.type"
+              type="text"
+              placeholder="Отчество"
+              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+          />
+        </div>
+
+        <div class="form-group checkboxes flex flex-col [gap:12px]">
+          <div class="flex items-center [gap:8px]">
+            <div>
+              <button
+                  type="button"
+                  @click="form.checked.terms = !form.checked.terms"
+                  :class="form.checked.terms ? 'bg-[url(/img/checkbox-on.svg)]' : 'bg-[url(/img/checkbox-off.svg)]'"
+                  class="w-[16px] h-[16px] bg-no-repeat bg-center bg-contain bg-transparent border-none outline-none"
+              ></button>
+            </div>
+            <div class="text-[#F5F5F5] text-[10px] leading-[140%] max-w-[220px]">
+              Я соглашаюсь с Условиями использования мини-приложения
+            </div>
+          </div>
+
+          <div class="flex items-center [gap:8px]">
+            <div>
+              <button
+                  type="button"
+                  @click="form.checked.pp = !form.checked.pp"
+                  :class="form.checked.pp ? 'bg-[url(/img/checkbox-on.svg)]' : 'bg-[url(/img/checkbox-off.svg)]'"
+                  class="w-[16px] h-[16px] bg-no-repeat bg-center bg-contain bg-transparent border-none outline-none"
+              ></button>
+            </div>
+            <div class="text-[#F5F5F5] text-[10px] leading-[140%] max-w-[220px]">
+              Я соглашаюсь с Условиями обработки ПД
+            </div>
+          </div>
+        </div>
+
+
+          <button type="submit" class="submit-btn bg-[#F4B44D]">Создать заявку</button>
+        </form>
+      </div>
+
     </div>
-
-    <!-- форма заявки -->
-    <form @submit.prevent="submit">
-      <div class="form-group">
-        <label>Адрес обменника (Город)</label>
-        <input v-model="form.city" type="text" placeholder="Город" required/>
-      </div>
-      <div class="form-group">
-        <label>Адрес обменника</label>
-        <input v-model="form.address" type="text" placeholder="Улица, дом" required/>
-      </div>
-      <div class="form-group">
-        <label>Тип заявки</label>
-        <select v-model="form.type">
-          <option disabled value="">Выберите тип...</option>
-          <option v-for="t in types" :key="t.value" :value="t.value">
-            {{ t.label }}
-          </option>
-        </select>
-        <small>{{ currentTypeDesc }}</small>
-      </div>
-      <div class="form-group">
-        <label>Сумма (₽)</label>
-        <input v-model.number="form.rub" type="number" placeholder="0" required/>
-      </div>
-      <div class="info-row">
-        <span>Курс:</span><span>{{ rate }}</span>
-      </div>
-      <div class="info-row">
-        <span>Комиссия:</span><span>{{ commission }}</span>
-      </div>
-      <div class="info-row">
-        <span>Получите (USDT):</span><span>{{ calcUSDT }}</span>
-      </div>
-      <div class="form-group">
-        <label>ФИО</label>
-        <input v-model="form.name" type="text" placeholder="Имя Фамилия" required/>
-      </div>
-      <div class="form-group">
-        <label>Телефон или email</label>
-        <input v-model="form.contact" type="text" placeholder="+7..." required/>
-      </div>
-      <div class="form-group">
-        <label>Кошелёк TRC‑20</label>
-        <input v-model="form.wallet" type="text" placeholder="Адрес кошелька" required/>
-      </div>
-      <div class="form-group checkboxes">
-        <label><input type="checkbox" v-model="form.checked.terms" required /> Ознакомлен с условиями</label>
-        <label><input type="checkbox" v-model="form.checked.pp" required /> Согласен на обработку персональных данных</label>
-      </div>
-
-      <button type="submit" class="submit-btn">Отправить заявку</button>
-    </form>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import RequestConfirmation from '@/components/RequestConfirmation.vue'
 
+const isSuccess = ref(false)         // Показывать ли страницу подтверждения
+const requestNumber = ref('')        // Номер заявки
+
+const wallet = ref('')
 const mode = ref('buy')
+
+const pasteFromClipboard = async () => {
+  try {
+    const text = await navigator.clipboard.readText()
+    wallet.value = text
+  } catch (err) {
+    console.error('Ошибка чтения из буфера обмена:', err)
+  }
+}
 
 const types = [
   { value: 'fast', label: 'Быстрый обмен', desc: 'Для быстрых транзакций ~10 мин' },
@@ -95,8 +222,7 @@ const form = ref({
   checked: { terms: false, pp: false },
 })
 
-const rate = '₽ / USDT 75.00'     // можно получать из API
-const commission = '1.5%'        // тоже из API
+const commission = '1.5%'
 
 const calcUSDT = computed(() => {
   if (!form.value.rub) return '0'
@@ -111,41 +237,32 @@ const currentTypeDesc = computed(() => {
 })
 
 function submit() {
-  alert(
-      `Заявка: ${mode.value}\n` +
-      `Город: ${form.value.city}, Адрес: ${form.value.address}\n` +
-      `Тип: ${form.value.type}\n` +
-      `Сумма: ${form.value.rub} ₽ → ${calcUSDT.value} USDT\n` +
-      `ФИО: ${form.value.name}\nКонтакт: ${form.value.contact}\n` +
-      `Тр‑20 кошелек: ${form.value.wallet}`
-  )
-  // здесь — отправка на backend API
+  // Здесь можно вызвать API и получить настоящий номер заявки
+  requestNumber.value = String(Math.floor(100000 + Math.random() * 900000))
+  isSuccess.value = true
+}
+
+function resetForm() {
+  isSuccess.value = false
+  requestNumber.value = ''
+  form.value = {
+    city: '',
+    address: '',
+    type: '',
+    rub: null,
+    name: '',
+    contact: '',
+    wallet: '',
+    checked: { terms: false, pp: false },
+  }
+  wallet.value = ''
 }
 </script>
 
 <style scoped>
-.exchange-page {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px;
-  background: #fff;
-  border-radius: 12px;
-  color: #333;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.logo {
-  font-weight: 600;
-  color: #3390ff;
-}
+
 .toggle-group {
   display: flex;
-  border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 24px;
@@ -153,16 +270,18 @@ function submit() {
 .toggle-group button {
   flex: 1;
   padding: 12px;
-  background: #f5f5f5;
+  background: #120e14;
   border: none;
   cursor: pointer;
   font-weight: 500;
+  color: #F5F5F5;
 }
 .toggle-group button.active {
-  background: #3390ff;
-  color: #fff;
+  background: #F4B44D;
+  color: #120e14;
 }
 .form-group {
+  background-color: transparent;
   margin-bottom: 16px;
 }
 .form-group label {
@@ -174,7 +293,7 @@ function submit() {
 .form-group select {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #404040;
   border-radius: 6px;
 }
 .info-row {
@@ -193,9 +312,9 @@ function submit() {
 .submit-btn {
   width: 100%;
   padding: 12px;
-  background: #3390ff;
+  background: #F4B44D;
   border: none;
-  color: #fff;
+  color: #231F25;
   font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
