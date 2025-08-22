@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "normal",
+    "title": "Обычная",
+    "description": "Обычная заявка",
+    "rates": {
+      "sell_rate": 9.2,
+      "buy_rate": 12.4
+    }
+  },
+  {
+    "id": 2,
+    "name": "vip",
+    "title": "Випка",
+    "description": "С доставкой на дом",
+    "rates": {
+      "sell_rate": 10.4,
+      "buy_rate": 12.5
+    }
+  }
+]

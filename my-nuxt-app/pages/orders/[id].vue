@@ -1,6 +1,18 @@
 <template>
   <div class="bg-[#231F25] min-h-screen text-[#F5F5F5] font-sans p-4">
-    <AppHeader :title="`Заявка ${orderId}`" />
+    <div class=" flex flex-col">
+      <AppHeader
+          :title="`Заявка ${orderId}`"
+          @toggle-menu="toggleMenu"
+          @toggle-pushes="togglePushes"
+      />
+      <MenuDrawer :visible="menuOpen">
+        <Menu @close="toggleMenu" />
+      </MenuDrawer>
+
+      <MenuDrawer :visible="pushesOpen">
+        <Pushes @close="togglePushes" />
+      </MenuDrawer>
     <div v-if="order" class="  rounded-[12px] px-[16px] mt-[1.5rem] mb-6">
       <span class="inline-block text-[12px] px-[6px] py-[2px] rounded-[6px] font-medium mb-0px]"
             :class="statusClass"
@@ -76,21 +88,33 @@
       </div>
 
       <!-- Кнопка -->
-      <button
-          class="w-full mt-[1rem] bg-transparent m border border-[#F4B44D] text-[#F4B44D]  font-medium py-[10px] rounded-[8px] text-[14px]"
-          @click="$emit('go-to-my-requests')"
+      <a
+          href="https://t.me/garex_support"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block no-underline w-full border border-[#F4B44D] text-center text-[#F4B44D] hover:bg-[#e0a73f] hover:text-black font-medium py-[10px] rounded-[8px] text-[14px]"
       >
         Написать в поддержку
-      </button>
+      </a>
     </div>
 
-
+</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
+
+const pushesOpen = ref(false)
+const menuOpen = ref(false)
+
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value
+}
+const togglePushes = () => {
+  pushesOpen.value = !pushesOpen.value
+}
 
 const route = useRoute()
 const orderId = route.params.id

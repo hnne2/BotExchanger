@@ -1,108 +1,167 @@
 <template>
   <div class="exchange-page bg-[#231F25] min-h-screen text-[#F5F5F5]">
+    <div class="flex flex-col">
+      <AppHeader
+          title="Покупка/Продажа"
+          @toggle-menu="toggleMenu"
+          @toggle-pushes="togglePushes"
+      />
+      <MenuDrawer :visible="menuOpen">
+        <Menu @close="toggleMenu" />
+      </MenuDrawer>
+
+      <MenuDrawer :visible="pushesOpen">
+        <Pushes @close="togglePushes" />
+      </MenuDrawer>
+
     <div class="mx-[1rem]">
       <!-- переключатели Buy/Sell -->
       <div>
-        <RequestConfirmation
-            v-if="isSuccess"
-            :request-number="requestNumber"
-            @create-another="resetForm"
-            @go-to-my-requests="$router.push('/my-requests')"
-        />
-        <form v-else @submit.prevent="submit">
-          <AppHeader title="Купить/Продажа" />
-
-          <div class="toggle-group  mt-[1rem]">
+          <div class="toggle-group mt-[1rem]">
             <button
                 :class="{ active: mode === 'buy' }"
-                @click="mode = 'buy'"
+                @click="changeMode('buy')"
             >Купить</button>
             <button
                 :class="{ active: mode === 'sell' }"
-                @click="mode = 'sell'"
+                @click="changeMode('sell')"
             >Продать</button>
           </div>
-        <div class="form-group my-[13px]">
+
+        <div class="form-group my-[13px] relative ">
           <select
-              v-model="form.type"
-              class="h-[40px]  w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-[20px] appearance-none focus:outline-none"
+              v-model="form.city"
+              :class="[
+      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
+      form.city === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
+    ]"
           >
-            <option disabled value="">Город</option>
-            <option v-for="t in types" :key="t.value" :value="t.value">
-              {{ t.label }}
+            <!-- Плейсхолдер (не показывается в списке) -->
+            <option disabled value="" hidden>Город</option>
+
+            <!-- Список городов -->
+            <option
+                v-for="t in cities"
+                :key="t.id"
+                :value="t.id"
+                class="bg-[#1a171d] text-[#f5f5f5] hover:bg-[#2a272d]"
+            >
+              {{ t.name }}
             </option>
           </select>
+
+          <!-- Кастомная стрелка -->
+          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
+            <img src="/img/pticka_down.svg" />
+          </div>
         </div>
 
-        <div class="form-group my-[13px]">
+
+
+        <!-- Адрес обменника -->
+        <div class="form-group my-[13px] relative">
           <select
-              v-model="form.type"
-              class="h-[40px] w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md appearance-none focus:outline-none"
+              v-model="form.address"
+              :class="[
+      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
+      form.address === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
+    ]"
           >
-            <option disabled value="">Адрес обменника</option>
-            <option v-for="t in types" :key="t.value" :value="t.value">
-              {{ t.label }}
+            <option disabled value="" hidden>Адрес обменника</option>
+            <option
+                v-for="branch in branches"
+                :key="branch.id"
+                :value="branch.id"
+                class="bg-[#1a171d] text-[#f5f5f5]"
+            >
+              {{ branch.address }}
             </option>
           </select>
+
+          <!-- Кастомная стрелка -->
+          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
+            <img src="/img/pticka_down.svg" />
+          </div>
         </div>
 
-        <div class="form-group my-[13px]">
+        <!-- Тип заявки -->
+        <div class="form-group my-[13px] relative">
           <select
               v-model="form.type"
-              class="h-[40px] w-full bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md appearance-none focus:outline-none"
+              :class="[
+      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
+      form.type === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
+    ]"
           >
-            <option disabled value="">Тип заявки</option>
-            <option v-for="t in types" :key="t.value" :value="t.value">
-              {{ t.label }}
+            <option disabled value="" hidden>Тип заявки</option>
+            <option
+                v-for="type in types"
+                :key="type.id"
+                :value="type.id"
+                class="bg-[#1a171d] text-[#f5f5f5]"
+            >
+              {{ type.title }}
             </option>
           </select>
+
+          <!-- Кастомная стрелка -->
+          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
+            <img src="/img/pticka_down.svg" />
+          </div>
+
+          <!-- Подсказка -->
+          <p v-if="selectedType"
+             class="text-[12px] text-[#F5F5F5] mt-[8px] pb-[0.5rem]">
+            Лимит продажи — {{ selectedBranch?.order_limit || 0 }} RUB,
+            комиссия обменника — {{ currentRate }}%
+          </p>
         </div>
 
-        <div class="bg-[#18141a] rounded-[12px] px-[16px] pt-[16px] pb-[24px] l text-[#F5F5F5] text-[14px] font-inter">
+
+        <div class="bg-[#18141a] rounded-[12px] px-[16px] pt-[16px] pb-[24px] text-[#F5F5F5] text-[14px] font-inter">
           <!-- Верхняя строка -->
           <div class="flex justify-between items-center mb-[12px]">
             <span class="text-[#F4B44D] font-medium text-[13px]">Отдаю</span>
-            <span class="text-[#AAAAAA] text-[12px]">1 RUB = 0,12345678 USDT</span>
-          </div>
+            <span class="text-[#AAAAAA] text-[12px]">
+  1 RUB = {{ displayRate }} USDT
+</span>          </div>
 
-          <!-- Поле ввода + select -->
+          <!-- Отдаю -->
           <div class="flex items-center gap-[8px]">
-            <input type="number" placeholder="0"
-                   class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#F5F5F5] placeholder-[#F5F5F5] text-[15px] outline-none w-full" />
-            <div class="relative">
-              <select
-                  class="bg-[#231F25] text-[#F5F5F5] text-[14px] pr-[32px] pl-[14px] py-[12px] rounded-[8px] appearance-none outline-none border-none">
-                <option>RUB</option>
-                <option>USD</option>
-                <option>EUR</option>
-              </select>
-              <!-- Иконка стрелки -->
-              <div class="pointer-events-none absolute right-[12px] top-1/2 -translate-y-1/2">
-                <svg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1L6 5L11 1" stroke="white" />
-                </svg>
-              </div>
+            <input
+                v-model="fromAmount"
+                type="number"
+                placeholder="0"
+                class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#F5F5F5] text-[15px] outline-none w-full"
+            />
+
+            <!-- справа — выпадашка -->
+            <div
+                class="bg-[#231F25] text-[#F5F5F5] w-[2.5rem] text-[14px] px-[12px] py-[12px] rounded-[8px] appearance-none outline-none border-none text-center "
+            >
+              {{ mode === 'buy' ? 'RUB' : 'USDT' }}
             </div>
           </div>
 
-          <!-- Метка "Получаю" -->
+          <!-- Получаю -->
           <div class="text-[#F4B44D] font-medium text-[13px] mt-[20px] mb-[12px]">
             Получаю
           </div>
 
-
           <div class="flex items-center gap-[8px]">
             <input
+                :value="toAmount"
                 type="number"
-                placeholder="0"
-                class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#F5F5F5] placeholder-[#F5F5F5] text-[15px] outline-none w-full"
+                readonly
+                class="flex-1 bg-[#120E14] border border-[#3E3A40] rounded-[8px] px-[14px] py-[12px] text-[#AAAAAA] text-[15px] outline-none w-full"
             />
+
+            <!-- справа фиксированная валюта -->
             <div
                 class="min-w-[48px] bg-[#231F25] text-[#F5F5F5] text-[14px] px-[14px] py-[12px] rounded-[8px] text-center border-none">
-              UZDT
+              {{ mode === 'buy' ? 'USDT' : 'RUB' }}
             </div>
-          </div>
-
+        </div>
         </div>
         <div class="flex items-center  my-[20px] [gap:5px]">
           <input
@@ -122,7 +181,7 @@
 
         <div class=" flex form-group my-[13px]  ">
           <input
-              v-model="form.type"
+              v-model="form.lastName"
               type="text"
               placeholder="Фамилия"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
@@ -131,7 +190,7 @@
 
         <div class=" flex form-group my-[13px]  ">
           <input
-              v-model="form.type"
+              v-model="form.firstName"
               type="text"
               placeholder="Имя"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
@@ -140,62 +199,226 @@
 
         <div class=" flex form-group my-[13px]  ">
           <input
-              v-model="form.type"
+              v-model="form.middleName"
               type="text"
               placeholder="Отчество"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
-
         <div class="form-group checkboxes flex flex-col [gap:12px]">
-          <div class="flex items-center [gap:8px]">
+          <div class="flex items-center gap-[8px]">
             <div>
-              <button
-                  type="button"
+              <div
                   @click="form.checked.terms = !form.checked.terms"
-                  :class="form.checked.terms ? 'bg-[url(/img/checkbox-on.svg)]' : 'bg-[url(/img/checkbox-off.svg)]'"
-                  class="w-[16px] h-[16px] bg-no-repeat bg-center bg-contain bg-transparent border-none outline-none"
-              ></button>
+                  :class="[
+        'w-[16px] h-[16px] rounded-[4px] flex items-center justify-center cursor-pointer border',
+        form.checked.terms ? 'bg-[#F4B44D] border-[#F4B44D]' : 'bg-transparent border-[#F4B44D]'
+      ]"
+              >
+                <img
+                    v-if="form.checked.terms"
+                    src="/img/ptichka.svg"
+                    alt="✔"
+                    class="w-[12px] h-[12px]"
+                />
+              </div>
             </div>
-            <div class="text-[#F5F5F5] text-[10px] leading-[140%] max-w-[220px]">
+            <div class="text-[#F5F5F5] text-[15px] pl-[0.1rem] pt-[1rem]">
               Я соглашаюсь с Условиями использования мини-приложения
             </div>
           </div>
 
-          <div class="flex items-center [gap:8px]">
+
+          <div class="flex items-center gap-[8px]">
             <div>
-              <button
-                  type="button"
+              <div
                   @click="form.checked.pp = !form.checked.pp"
-                  :class="form.checked.pp ? 'bg-[url(/img/checkbox-on.svg)]' : 'bg-[url(/img/checkbox-off.svg)]'"
-                  class="w-[16px] h-[16px] bg-no-repeat bg-center bg-contain bg-transparent border-none outline-none"
-              ></button>
+                  :class="[
+        'w-[16px] h-[16px] rounded-[4px] flex items-center justify-center cursor-pointer border',
+        form.checked.pp ? 'bg-[#F4B44D] border-[#F4B44D]' : 'bg-transparent border-[#F4B44D]'
+      ]"
+              >
+                <img
+                    v-if="form.checked.pp"
+                    src="/img/ptichka.svg"
+                    alt="✔"
+                    class="w-[12px] h-[12px]"
+                />
+              </div>
             </div>
-            <div class="text-[#F5F5F5] text-[10px] leading-[140%] max-w-[220px]">
+            <div class="text-[#F5F5F5] text-[15px] pl-[0.1rem]">
               Я соглашаюсь с Условиями обработки ПД
             </div>
           </div>
+
         </div>
 
-
-          <button type="submit" class="submit-btn bg-[#F4B44D]">Создать заявку</button>
-        </form>
+        <!-- кнопка -->
+        <button
+            type="button"
+            class="submit-btn bg-[#F4B44D] mb-[2rem]"
+            @click="submitOrder"
+        >
+          Создать заявку
+        </button>
       </div>
 
     </div>
   </div>
+  </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
-import RequestConfirmation from '@/components/RequestConfirmation.vue'
+<script setup lang="ts">
+import { ref, onMounted, watch, computed } from 'vue'
+import CustomSelect from '@/components/CustomSelect.vue'
+const pushesOpen = ref(false)
+const menuOpen = ref(false)
 
-const isSuccess = ref(false)         // Показывать ли страницу подтверждения
-const requestNumber = ref('')        // Номер заявки
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value
+}
+const togglePushes = () => {
+  pushesOpen.value = !pushesOpen.value
+}
+const router = useRouter()
 
+async function submitOrder() {
+  if (
+      !form.value.city ||
+      !form.value.address ||
+      !form.value.type ||
+      !fromAmount.value ||
+      !wallet.value ||
+      !form.value.lastName ||
+      !form.value.firstName ||
+      !form.value.middleName ||
+      !form.value.checked.terms ||
+      !form.value.checked.pp
+  ) {
+    alert('Пожалуйста, заполните все поля и согласитесь с условиями')
+    return
+  }
+
+  try {
+    const payload = {
+      user_id: 1,
+      branch_id: form.value.address,
+      order_type_id: form.value.type,
+      amount: fromAmount.value,
+      type: mode.value,
+      order_status_id: 1
+    }
+
+    const response = await $fetch<{ order_id: number }>('/api/order', {
+      method: 'POST',
+      body: payload,
+    })
+
+    router.push({
+      path: '/status',
+      query: { success: 'true', order: response.order_id.toString() },
+    })
+  } catch (err) {
+    console.error('Ошибка при создании заявки:', err)
+
+    router.push({
+      path: '/status',
+      query: { success: 'false' },
+    })
+  }
+}
+
+
+interface RatesResponse {
+  buy: number
+  sell: number
+}
+
+const props = defineProps<{
+  options: string[]
+  modelValue: string
+  placeholder?: string
+}>()
+
+const emit = defineEmits(['update:modelValue'])
+const selected = ref(props.modelValue)
+
+watch(selected, (value) => {
+  emit('update:modelValue', value)
+})
+
+/** =========================
+ * 1. Состояние формы
+ ========================== */
+const form = ref({
+  city: '',
+  address: '',
+  type: '',
+  rub: null as number | null,
+  name: '',
+  contact: '',
+  wallet: '',
+  lastName: '',
+  firstName: '',
+  middleName: '',
+  checked: { terms: false, pp: false },
+})
+
+/** =========================
+ * 2. Общие переменные / флаги
+ ========================== */
+const isSuccess = ref(false)
+const requestNumber = ref('')
 const wallet = ref('')
-const mode = ref('buy')
+const mode = ref<'buy' | 'sell'>('buy')
+const fromAmount = ref(0)
 
+const fromCurrency = ref('fiat')   // Отдаю
+const toCurrency = ref('crypto')  // Получаю
+
+/** =========================
+ * 3. Данные из API
+ ========================== */
+const cities = ref<any[]>([])
+const branches = ref<any[]>([])
+const types = ref<any[]>([])
+const selectedBranch = ref<Record<string, any>>({})
+const rates = ref<RatesResponse>({ buy: 0, sell: 0 }) // ✅ дефолтное значение
+
+/** =========================
+ * 4. Вычисляемые значения
+ ========================== */
+const displayRate = computed(() => {
+  if (!rates.value) return '-'
+  return mode.value === 'buy'
+      ? rates.value.buy
+      : rates.value.sell
+})
+
+const selectedType = computed(() => {
+  return types.value.find(t => t.id === form.value.type)
+})
+
+// const currentRate = computed(() => {
+//   if (!selectedType.value) return null
+//   return mode.value === 'sell'
+//       ? selectedType.value.rates.sell_rate
+//       : selectedType.value.rates.buy_rate
+// })
+
+const toAmount = computed(() => {
+  if (!fromAmount.value) return '0.00'
+
+  if (mode.value === 'buy') {
+    return (fromAmount.value / rates.value.buy).toFixed(2)
+  } else {
+    return (fromAmount.value * rates.value.sell).toFixed(2)
+  }
+})
+
+/** =========================
+ * 5. Методы
+ ========================== */
 const pasteFromClipboard = async () => {
   try {
     const text = await navigator.clipboard.readText()
@@ -203,43 +426,6 @@ const pasteFromClipboard = async () => {
   } catch (err) {
     console.error('Ошибка чтения из буфера обмена:', err)
   }
-}
-
-const types = [
-  { value: 'fast', label: 'Быстрый обмен', desc: 'Для быстрых транзакций ~10 мин' },
-  { value: 'best', label: 'Лучший курс', desc: 'Ожидаем подходящий курс' },
-  { value: 'instant', label: 'Мгновенный', desc: 'Мгновенный перевод' },
-]
-
-const form = ref({
-  city: '',
-  address: '',
-  type: '',
-  rub: null,
-  name: '',
-  contact: '',
-  wallet: '',
-  checked: { terms: false, pp: false },
-})
-
-const commission = '1.5%'
-
-const calcUSDT = computed(() => {
-  if (!form.value.rub) return '0'
-  const rub = form.value.rub
-  const pct = 1 + parseFloat(commission) / 100
-  return (rub / 75 / pct).toFixed(4)
-})
-
-const currentTypeDesc = computed(() => {
-  const sel = types.find(t => t.value === form.value.type)
-  return sel ? sel.desc : ''
-})
-
-function submit() {
-  // Здесь можно вызвать API и получить настоящий номер заявки
-  requestNumber.value = String(Math.floor(100000 + Math.random() * 900000))
-  isSuccess.value = true
 }
 
 function resetForm() {
@@ -253,11 +439,74 @@ function resetForm() {
     name: '',
     contact: '',
     wallet: '',
+    lastName: '',
+    firstName: '',
+    middleName: '',
     checked: { terms: false, pp: false },
   }
   wallet.value = ''
 }
+
+function changeMode(newMode: 'buy' | 'sell') {
+  mode.value = newMode
+  isSuccess.value = false
+
+  if (newMode === 'buy') {
+    fromCurrency.value = 'fiat'
+    toCurrency.value = 'crypto'
+  } else {
+    fromCurrency.value = 'crypto'
+    toCurrency.value = 'fiat'
+  }
+}
+
+const fetchOrderTypes = async (branchId: string | number) => {
+  try {
+    const data = await $fetch(`/api/branch/${branchId}/order-types`)
+    types.value = data
+  } catch (e) {
+    console.error('Ошибка при загрузке типов заявок:', e)
+    types.value = []
+  }
+}
+
+const fetchBranch = async (branchId: string | number) => {
+  try {
+    const branch = await $fetch(`/api/branch/${branchId}`)
+    selectedBranch.value = branch
+  } catch (e) {
+    console.error('Ошибка при получении филиала:', e)
+  }
+}
+
+/** =========================
+ * 6. Загрузка данных
+ ========================== */
+onMounted(async () => {
+  try {
+    cities.value = await $fetch('/api/city')
+    rates.value = await $fetch<RatesResponse>('/api/rates')
+    console.log('Курсы:', rates.value)
+  } catch (error) {
+    console.error('Ошибка при инициализации:', error)
+  }
+})
+
+watch(() => form.value.city, async (newCityId) => {
+  if (!newCityId) return
+  branches.value = await $fetch(`/api/city/${newCityId}/branches`)
+})
+
+watch(() => form.value.address, (newBranchId) => {
+  if (newBranchId) {
+    fetchOrderTypes(newBranchId)
+    fetchBranch(newBranchId)
+  } else {
+    types.value = []
+  }
+})
 </script>
+
 
 <style scoped>
 

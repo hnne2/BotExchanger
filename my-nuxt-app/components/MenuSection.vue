@@ -1,7 +1,9 @@
 <template>
-  <div
-      class="flex items-center justify-between  px-[6px] py-[6px] [border-radius:8px] mb-[8px] mx-[16px] transition-all"
-      :class="disabled ? 'bg-[#120E1447]' : 'bg-[#120E1447] hover:bg-[#2a242e] '"
+  <component
+      :is="!disabled && link ? 'a' : 'div'"
+      :href="!disabled ? link : null"
+      class="no-underline flex items-center justify-between px-[6px] py-[6px] [border-radius:8px] mb-[8px] mx-[16px] transition-all"
+      :class="disabled ? 'bg-[#120E1447]' : 'bg-[#120E1447] hover:bg-[#2a242e]'"
   >
     <div class="flex items-center gap-[8px]">
       <img :src="icon" alt="icon" class="w-[34px] h-[34px]" />
@@ -18,13 +20,14 @@
         alt="arrow"
         class="w-[12px] h-[12px]"
     />
-  </div>
+  </component>
 </template>
 
 <script setup>
 defineProps({
   icon: { type: String, required: true },
   title: { type: String, required: true },
+  link: { type: String, default: '' },
   disabled: { type: Boolean, default: false }
 })
 </script>

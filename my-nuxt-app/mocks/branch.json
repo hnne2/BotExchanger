@@ -1,0 +1,11 @@
+{
+  "id": 11,
+  "city_id": 7,
+  "address": "ул. Пушкина, д. Колотушкина",
+  "working_hours": "08:30 - 19:30",
+  "order_limit": 150000,
+  "coords": {
+    "latitude": 53.18475768,
+    "longitude": 44.97754898
+  }
+}

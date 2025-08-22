@@ -2,7 +2,7 @@
   <NuxtLink :to="`/orders/${order.id}`" class="no-underline">
     <div class="w-full bg-[#120E1447] rounded-[12px] px-[16px] py-[12px] mb-[12px] cursor-pointer hover:bg-[#2A2630] transition">
       <!-- Первая строка -->
-      <div class="flex justify-between items-center mb-[8px]">
+      <div class="flex justify-between items-center mb-[0px]">
         <span
             :class="statusClass"
             class="text-[12px] px-[6px] py-[2px] rounded-[6px] font-medium"
@@ -15,7 +15,7 @@
       </div>
 
       <!-- Вторая строка -->
-      <div class="flex justify-between items-center mb-[8px]">
+      <div class="flex justify-between items-center mb-[0px]">
         <p class="text-[16px] font-semibold text-[#F5F5F5]">
           Заявка {{ order.id }}
         </p>
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Третья строка -->
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center ">
         <p class="text-[12px] text-[#9C9C9C]">
           {{ order.date }}
         </p>

@@ -14,12 +14,18 @@
 <script setup>
 import { watch } from 'vue'
 
+
 const props = defineProps({
   visible: Boolean
 })
 
 watch(() => props.visible, (val) => {
-  document.body.style.overflow = val ? 'hidden' : ''
+  if (val) {
+    document.body.style.overflow = 'hidden'
+    window.scrollTo(0, 0) // <--- ВАЖНО
+  } else {
+    document.body.style.overflow = ''
+  }
 })
 </script>
 

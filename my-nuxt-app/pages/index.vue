@@ -1,8 +1,16 @@
   <template>
     <div class="homepage text-[#F5F5F5]">
-      <AppHeader @toggle-menu="toggleMenu" />
+      <AppHeader
+          @toggle-menu="toggleMenu"
+          @toggle-pushes="togglePushes"
+      />
+
       <MenuDrawer :visible="menuOpen">
         <Menu @close="toggleMenu" />
+      </MenuDrawer>
+
+      <MenuDrawer :visible="pushesOpen">
+        <Pushes @close="togglePushes" />
       </MenuDrawer>
       <div class="background-wrapper">
         <div class="container">
@@ -12,15 +20,15 @@
           </div>
 
           <div class="action-buttons">
-            <ActionButton icon="/img/pokupka_prodaja.svg" label="Покупка и продажа" />
+            <ActionButton icon="/img/pokupka_prodaja.svg" label="Покупка и продажа"  to="/exchange"/>
             <MyOrders icon="/img/moi_zayavki.svg" label="Мои заявки" to="/orders" />
           </div>
 
           <div class="menu-items">
-            <MenuItem icon="/img/kurs_komissii.svg" label="Курс и комиссии" to="/rates" />
-            <MenuItem icon="/img/adressObmennika.svg" label="Адреса обменников" to="/locations" />
+            <MenuItem icon="/img/kurs_komissii.svg" label="Курс и комиссии" to="/course_and_commission" />
+            <MenuItem icon="/img/adressObmennika.svg" label="Адреса обменников" to="/adreses" />
             <MenuItem icon="/img/referalProgram.svg" label="Реферальная программа" soon />
-            <MenuItem icon="/img/podderjka.svg" label="Поддержка" to="/support" />
+            <MenuItem icon="/img/podderjka.svg" label="Поддержка" to="https://t.me/garex_support" />
           </div>
         </div>
       </div>
@@ -34,11 +42,17 @@
   import MyOrders from '@/components/MyOrders.vue'
   import MenuDrawer from '@/components/MenuDrawer.vue'
   import Menu from '@/components/Menu.vue'
+  import Pushes from '@/components/Pushes.vue'
 
 
+  const pushesOpen = ref(false)
   const menuOpen = ref(false)
+
   const toggleMenu = () => {
     menuOpen.value = !menuOpen.value
+  }
+  const togglePushes = () => {
+    pushesOpen.value = !pushesOpen.value
   }
   </script>
 

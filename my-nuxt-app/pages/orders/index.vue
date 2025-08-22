@@ -1,6 +1,18 @@
 <template>
   <div class="orders-page bg-[#231F25] min-h-screen text-[#F5F5F5]">
-    <AppHeader title="Купить/Продажа" />
+    <div class=" flex flex-col">
+      <AppHeader
+          title="Мои заявки"
+          @toggle-menu="toggleMenu"
+          @toggle-pushes="togglePushes"
+      />
+      <MenuDrawer :visible="menuOpen">
+        <Menu @close="toggleMenu" />
+      </MenuDrawer>
+
+      <MenuDrawer :visible="pushesOpen">
+        <Pushes @close="togglePushes" />
+      </MenuDrawer>
 
     <div class="mx-[1rem]">
 
@@ -52,6 +64,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 
@@ -59,6 +72,16 @@
 import OrderCard from '~/components/OrderCard.vue'
 import { useOrders } from '~/composables/useOrders'
 import {ref} from "vue";
+
+const pushesOpen = ref(false)
+const menuOpen = ref(false)
+
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value
+}
+const togglePushes = () => {
+  pushesOpen.value = !pushesOpen.value
+}
 
 const mode = ref('active')
 const { orders } = useOrders()
