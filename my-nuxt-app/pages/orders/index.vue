@@ -67,37 +67,63 @@
   </div>
 </template>
 
-
-<script setup>
+<script setup lang="ts">
 import OrderCard from '~/components/OrderCard.vue'
-import { useOrders } from '~/composables/useOrders'
-import {ref} from "vue";
+import { ref, computed, onMounted } from 'vue'
 
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
 
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value
-}
-const togglePushes = () => {
-  pushesOpen.value = !pushesOpen.value
+const toggleMenu = () => (menuOpen.value = !menuOpen.value)
+const togglePushes = () => (pushesOpen.value = !pushesOpen.value)
+
+const mode = ref<'active' | 'archive'>('active')
+const filter = ref<'all' | 'buy' | 'sell'>('all')
+
+const orders = ref<Order[]>([])
+
+interface Order {
+  id: number
+  user_id: number
+  branch_id: number
+  order_type_id: number
+  order_status_id: number
+  amount: number
+  type: 'buy' | 'sell'
+  created_at: string
+  crypto_amount: number
+  rate: number
+  commission: string
+  commission_amount: number
+  address: string
+  fullName: string
+  wallet: string | null
+  rejectReason: string | null
 }
 
-const mode = ref('active')
-const { orders } = useOrders()
-const filter = ref('all')
+// запрос к API
+onMounted(async () => {
+  try {
+    const data = await $fetch<Order[]>('/api/order/:id', { query: { id: 1 } })
+    orders.value = data
+  } catch (e) {
+    console.error('Ошибка при загрузке заявок:', e)
+  }
+})
 
+// фильтрация
 const filteredOrders = computed(() => {
   return orders.value.filter(order => {
-    const matchesTab = mode.value === 'active' ? !order.archived : order.archived
+    // считаем order_status_id === 1 → активная, иначе → архив
+    const isActive = order.order_status_id === 1
+    const matchesTab = mode.value === 'active' ? isActive : !isActive
     const matchesFilter =
-        filter.value === 'all' ||
-        (filter.value === 'buy' && order.type === 'Покупка') ||
-        (filter.value === 'sell' && order.type === 'Продажа')
+        filter.value === 'all' || order.type === filter.value
     return matchesTab && matchesFilter
   })
 })
 </script>
+
 <style scoped>
 .toggle-group {
   display: flex;

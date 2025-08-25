@@ -1,33 +1,35 @@
 <template>
   <NuxtLink :to="`/orders/${order.id}`" class="no-underline">
-    <div class="w-full bg-[#120E1447] rounded-[12px] px-[16px] py-[12px] mb-[12px] cursor-pointer hover:bg-[#2A2630] transition">
+    <div
+        class="w-full bg-[#120E1447] rounded-[12px] px-[16px] py-[12px] mb-[12px] cursor-pointer hover:bg-[#2A2630] transition"
+    >
       <!-- Первая строка -->
-      <div class="flex justify-between items-center mb-[0px]">
+      <div class="flex justify-between items-center">
         <span
             :class="statusClass"
             class="text-[12px] px-[6px] py-[2px] rounded-[6px] font-medium"
         >
-          {{ order.status }}
+          {{ statusLabel }}
         </span>
-        <span class="text-[14px] text-[#F5F5F5] opacity-80">
+        <span class="text-[14px] text-[#F5F5F5] opacity-80 uppercase">
           {{ order.type }}
         </span>
       </div>
 
       <!-- Вторая строка -->
-      <div class="flex justify-between items-center mb-[0px]">
+      <div class="flex justify-between items-center">
         <p class="text-[16px] font-semibold text-[#F5F5F5]">
           Заявка {{ order.id }}
         </p>
         <p class="text-[16px] font-semibold text-[#F4B44D]">
-          ${{ order.usd }} / {{ order.usdt }} USDT
+          ${{ order.amount }} / {{ order.crypto_amount }} USDT
         </p>
       </div>
 
       <!-- Третья строка -->
-      <div class="flex justify-between items-center ">
+      <div class="flex justify-between items-center">
         <p class="text-[12px] text-[#9C9C9C]">
-          {{ order.date }}
+          {{ formattedDate }}
         </p>
         <span class="text-[12px] text-[#9C9C9C]">отдаю / получаю</span>
       </div>
@@ -35,31 +37,58 @@
   </NuxtLink>
 </template>
 
-
-
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const { order } = defineProps<{
   order: {
     id: number
-    status: string
-    date: string
-    type: string
-    usd: number
-    usdt: number
+    user_id: number
+    order_status_id: number
+    amount: number
+    type: 'buy' | 'sell'
+    created_at: string
+    crypto_amount: number
   }
 }>()
 
-const statusClass = computed(() => {
-  switch (order.status) {
-    case 'Новая':
-      return 'bg-[#F4B44D] text-[#231F25]'
-    case 'Подтверждена':
-      return 'bg-[#78E052] text-[#231F25]'
-    case 'Отклонена':
-      return 'bg-[#FF542A] text-[#231F25]'
+// мапим статус по order_status_id
+const statusLabel = computed(() => {
+  switch (order.order_status_id) {
+    case 1:
+      return 'Новая'
+    case 2:
+      return 'Подтверждена'
+    case 3:
+      return 'Отклонена'
     default:
-      return 'bg-[#9C9C9C] text-[#231F25]'
+      return 'Неизвестно'
   }
 })
-</script>
 
+// класс для статуса
+const statusClass = computed(() => {
+  switch (order.order_status_id) {
+    case 1:
+      return 'bg-[#F4B44D] text-[#231F25]' // новая
+    case 2:
+      return 'bg-[#78E052] text-[#231F25]' // подтверждена
+    case 3:
+      return 'bg-[#FF542A] text-[#231F25]' // отклонена
+    default:
+      return 'bg-[#9C9C9C] text-[#231F25]' // неизвестно
+  }
+})
+
+// формат даты
+const formattedDate = computed(() => {
+  const d = new Date(order.created_at)
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+})
+</script>

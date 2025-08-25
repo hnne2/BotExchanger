@@ -16,11 +16,13 @@
       <!-- Кнопки -->
       <div class="flex gap-[12px] w-full pb-[1rem]">
         <button
+            @click="goToExchange"
             class="flex-1 px-[16px] py-[10px] bg-[#F4B44D] hover:bg-yellow-600 text-black font-medium rounded-[0.5rem] transition"
         >
           Создать заявку
         </button>
         <button
+            @click="goToInfo"
             class="flex-1 px-[16px] py-[10px] bg-transparent border border-[#F4B44D] text-[#F4B44D] hover:bg-yellow-500 hover:text-black font-medium rounded-[0.5rem] transition"
         >
           Подробнее
@@ -35,7 +37,28 @@ interface Props {
   title: string
   address: string
   workingHours: string
+  city_id: number
+  branch_id: number
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+function goToExchange() {
+  navigateTo({
+    path: '/exchange',
+    query: {
+      city_id: props.city_id,
+      branch_id: props.branch_id
+    }
+  })
+}
+function goToInfo() {
+  navigateTo({
+    path: '/course_and_commission',
+    query: {
+      city_id: props.city_id,
+      branch_id: props.branch_id
+    }
+  })
+}
 </script>

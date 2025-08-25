@@ -74,8 +74,9 @@
             v-for="branch in branches"
             :key="branch.id"
             :title="selectedCity.name"
-            :address="branch.address"
             :workingHours="branch.working_hours"
+            :branch_id="branch.id"
+            :city_id="selectedCity.id"
         />
       </div>
 

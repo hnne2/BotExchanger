@@ -16,7 +16,7 @@
     <div v-if="order" class="  rounded-[12px] px-[16px] mt-[1.5rem] mb-6">
       <span class="inline-block text-[12px] px-[6px] py-[2px] rounded-[6px] font-medium mb-0px]"
             :class="statusClass"
-      >{{ order.status }}
+      >{{ statusLabel }}
       </span>
       <div class="flex items-center ">
         <p class="text-[25px] text-[#F5F5F5] my-[1rem]">
@@ -37,7 +37,7 @@
       <!-- Дата -->
       <div class="flex items-center text-[12px] text-[#9C9C9C] mb-[1rem]">
         <span class="mr-2">Дата создания</span>
-        <span class="text-[#F5F5F5]  mx-[1rem]">{{ order.date }}</span>
+        <span class="text-[#F5F5F5]  mx-[1rem]">{{ order.created_at }}</span>
       </div>
     </div>
 
@@ -46,7 +46,7 @@
         <!-- Левая часть -->
         <div class="flex-1 ms-[1rem] border-r border-[#231f25]">
           <p class="text-[#fbbf24]   font-semibold">
-            $ {{ order.payAmount }}
+            $ {{ order.amount }}
           </p>
           <p class=" text-[14px] text-[#9C9C9C] ">
             Сумма валюты для покупки
@@ -56,7 +56,7 @@
         <!-- Правая часть -->
         <div class="flex-1 ms-[1rem] rounded-[1rem]">
           <p class="text-[#fbbf24]  font-semibold">
-            {{ order.receiveAmount }} USDT
+            {{ order.crypto_amount }} USDT
           </p>
           <p class=" text-[14px] text-[#9C9C9C] ">
             Сумма валюты для получения
@@ -75,7 +75,7 @@
 
       <div class="flex  border-b border-[#404040] pb-[8px]">
         <span class="text-[14px] text-[#9C9C9C] w-1/2 ">Комиссия</span>
-        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.fee }}</span>
+        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.commission }}</span>
       </div>
 
       <div class="flex justify-between border-b border-[#404040] pb-[8px]">
@@ -84,7 +84,7 @@
       </div>
       <div class="flex justify-between">
         <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">ФИО получателя</span>
-        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.recipient }}</span>
+        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.fullName }}</span>
       </div>
 
       <!-- Кнопка -->
@@ -106,6 +106,25 @@
 import { useRoute } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 
+interface Order {
+  id: number
+  user_id: number
+  branch_id: number
+  order_type_id: number
+  order_status_id: number
+  amount: number
+  type: 'buy' | 'sell'
+  created_at: string
+  crypto_amount: number
+  rate: number
+  commission: string
+  commission_amount: number
+  address: string
+  fullName: string
+  wallet: string | null
+  rejectReason: string | null
+}
+
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
 
@@ -122,32 +141,38 @@ const orderId = route.params.id
 // Заглушка под запрос
 const order = ref<any | null>(null)
 
-onMounted(() => {
-  // имитация ответа API
-  order.value = {
-    id: orderId,
-    status: 'Новая',
-    date: '12.07.2025 20:33',
-    type: 'Продажа',
-    rate: '1 USDT = 12345789 $',
-    fee: '0,3%',
-    address: 'г. Пенза,\nСоциалистическая, 21,\nофис 210, 2 этаж',
-    recipient: 'Иванов Иван Иванович',
-    payAmount: 450,
-    receiveAmount: 45
+onMounted(async () => {
+  try {
+    const data = await $fetch<Order[]>(`/api/order/${orderId}`, { query: { id: 1 } })
+    order.value = data
+  } catch (e) {
+    console.error('Ошибка при загрузке заявок:', e)
+  }
+})
+const statusLabel = computed(() => {
+  switch (order.value.order_status_id) {
+    case 1:
+      return 'Новая'
+    case 2:
+      return 'Подтверждена'
+    case 3:
+      return 'Отклонена'
+    default:
+      return 'Неизвестно'
   }
 })
 
+// класс для статуса
 const statusClass = computed(() => {
-  switch (order.value?.status) {
-    case 'Новая':
-      return 'bg-[#F4B44D] text-[#231F25]'
-    case 'Подтверждена':
-      return 'bg-[#78E052] text-[#231F25]'
-    case 'Отклонена':
-      return 'bg-[#FF542A] text-[#231F25]'
+  switch (order.value.order_status_id) {
+    case 1:
+      return 'bg-[#F4B44D] text-[#231F25]' // новая
+    case 2:
+      return 'bg-[#78E052] text-[#231F25]' // подтверждена
+    case 3:
+      return 'bg-[#FF542A] text-[#231F25]' // отклонена
     default:
-      return 'bg-[#9C9C9C] text-[#231F25]'
+      return 'bg-[#9C9C9C] text-[#231F25]' // неизвестно
   }
 })
 

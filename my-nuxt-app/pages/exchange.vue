@@ -183,7 +183,7 @@
           <input
               v-model="form.lastName"
               type="text"
-              placeholder="Фамилия"
+              placeholder="Фамилия*"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
@@ -192,7 +192,7 @@
           <input
               v-model="form.firstName"
               type="text"
-              placeholder="Имя"
+              placeholder="Имя*"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
@@ -201,7 +201,7 @@
           <input
               v-model="form.middleName"
               type="text"
-              placeholder="Отчество"
+              placeholder="Отчество (при наличии)"
               class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
@@ -223,7 +223,7 @@
                 />
               </div>
             </div>
-            <div class="text-[#F5F5F5] text-[15px] pl-[0.1rem] pt-[1rem]">
+            <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem] pt-[1rem]">
               Я соглашаюсь с Условиями использования мини-приложения
             </div>
           </div>
@@ -246,7 +246,7 @@
                 />
               </div>
             </div>
-            <div class="text-[#F5F5F5] text-[15px] pl-[0.1rem]">
+            <div class="text-[#F5F5F5]  text-[13px] pl-[0.1rem]">
               Я соглашаюсь с Условиями обработки ПД
             </div>
           </div>
@@ -270,7 +270,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
-import CustomSelect from '@/components/CustomSelect.vue'
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
 
@@ -280,6 +279,21 @@ const toggleMenu = () => {
 const togglePushes = () => {
   pushesOpen.value = !pushesOpen.value
 }
+
+const route = useRoute()
+
+
+onMounted(() => {
+  if (route.query.city_id) {
+    form.value.city = String(route.query.city_id)
+  }
+
+  if (route.query.branch_id) {
+    // сохраняем именно id
+    form.value.address = String(route.query.branch_id)
+  }
+})
+
 const router = useRouter()
 
 async function submitOrder() {
@@ -353,6 +367,7 @@ watch(selected, (value) => {
 const form = ref({
   city: '',
   address: '',
+  branch_id: '',
   type: '',
   rub: null as number | null,
   name: '',
@@ -434,6 +449,7 @@ function resetForm() {
   form.value = {
     city: '',
     address: '',
+    branch_id: '',
     type: '',
     rub: null,
     name: '',
@@ -495,6 +511,17 @@ onMounted(async () => {
 watch(() => form.value.city, async (newCityId) => {
   if (!newCityId) return
   branches.value = await $fetch(`/api/city/${newCityId}/branches`)
+
+  // если был branch_id в query, проверим совпадение
+  if (route.query.branch_id) {
+    const branch = branches.value.find(
+        b => b.id === Number(route.query.branch_id)
+    )
+    if (branch) {
+      form.value.address = String(branch.id)
+      selectedBranch.value = branch
+    }
+  }
 })
 
 watch(() => form.value.address, (newBranchId) => {
@@ -532,11 +559,13 @@ watch(() => form.value.address, (newBranchId) => {
 .form-group {
   background-color: transparent;
   margin-bottom: 16px;
+  font-weight: 200;
+
 }
 .form-group label {
   display: block;
   margin-bottom: 4px;
-  font-weight: 500;
+  font-weight: 200;
 }
 .form-group input,
 .form-group select {

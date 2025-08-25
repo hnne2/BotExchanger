@@ -97,6 +97,7 @@
         <div
             v-for="type in orderTypes"
             :key="type.id"
+            @click="goToExchange"
             class=" text-[#F4B44D]"
         >
           <!-- Название заявки -->
@@ -148,7 +149,15 @@
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted} from 'vue'
+import {ref, onMounted, onUnmounted, watch} from 'vue'
+const route = useRoute()
+const form = ref({
+  city: '',
+  address: '',
+  city_id:'',
+  branch_id: ''
+})
+
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
 
@@ -193,12 +202,14 @@ const selectCity = async (city) => {
   selectedCity.value = city
   selectedBranch.value = null
   isCityDropdownOpen.value = false
+  form.city_id = city.id
   await fetchBranches(city.id)
 }
 
 const selectBranch = async (branch) => {
   selectedBranch.value = branch
   isBranchDropdownOpen.value = false
+  form.branch_id = branch.id
   await fetchOrderTypes(branch.id)
 }
 
@@ -221,19 +232,53 @@ const fetchBranches = async (cityId) => {
     branches.value = []
   }
 }
-
+watch(() => form.value.city, async (newCityId) => {
+  if (!newCityId) return
+  await fetchBranches(Number(newCityId))
+})
 // ▼ ОБРАБОТЧИК ЗАКРЫТИЯ ▼
-onMounted(() => {
-  fetchCities()
+onMounted(async () => {
+  await fetchCities()
 
-  const close = (e) => {
-    if (!e.target.closest('.dropdown-menu')) {
-      isCityDropdownOpen.value = false
-      isBranchDropdownOpen.value = false
+  // если есть city_id в query → подставляем
+  if (route.query.city_id) {
+      const city = cities.value.find(
+          b => b.id === Number(route.query.city_id)
+      )
+      if (city) {
+        form.value.city = String(city.id)
+        selectedCity.value = city
+      }
+    await fetchBranches(Number(route.query.city_id))
+
+  }
+})
+watch(() => form.value.city, async (newCityId) => {
+  if (!newCityId) return
+  form.city_id = newCityId
+  branches.value = await $fetch(`/api/city/${newCityId}/branches`)
+
+  if (route.query.branch_id) {
+    const branch = branches.value.find(
+        b => b.id === Number(route.query.branch_id)
+    )
+    if (branch) {
+      form.value.address = String(branch.id)
+      selectedBranch.value = branch
+      form.branch_id = branch.id
+      await fetchOrderTypes(branch.id)
+
     }
   }
-
-  document.addEventListener('click', close)
-  onUnmounted(() => document.removeEventListener('click', close))
 })
+function goToExchange() {
+  console.log("aaa"+form.city_id)
+  navigateTo({
+    path: '/exchange',
+    query: {
+      city_id: form.city_id,
+      branch_id: form.branch_id
+    }
+  })
+}
 </script>

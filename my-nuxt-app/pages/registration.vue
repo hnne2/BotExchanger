@@ -1,8 +1,7 @@
 <template>
-  <div class="register-page ">
+  <div class="register-page">
     <div class=" flex flex-col ">
       <AppHeader
-          title="Регистрация"
           @toggle-menu="toggleMenu"
           @toggle-pushes="togglePushes"
       />
@@ -16,7 +15,7 @@
 
     <div class="background-wrapper">
       <div class="container ">
-        <h1 class="title">Завершите процесс<br />регистрации</h1>
+        <h1 class="title text-left">Завершите процесс<br />регистрации</h1>
 
         <form @submit.prevent="submitForm" class="form ">
           <input
@@ -62,16 +61,19 @@
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem]">
               Я соглашаюсь с Условиями использования мини-приложения            </div>
           </div>
-          <button type="submit" class="submit-button">Продолжить</button>
-        </form>
+          <button
+              type="submit"
+              class="submit-button fixed left-1/2 transform -translate-x-1/2 bottom-[2rem] w-[90%] max-w-[400px]"
+          >
+            Продолжить
+          </button>        </form>
       </div>
     </div>
   </div>
   </div>
 </template>
-
 <script setup>
-import {reactive, ref} from 'vue'
+import { reactive, ref } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 
 const pushesOpen = ref(false)
@@ -88,23 +90,55 @@ const form = reactive({
   lastName: '',
   firstName: '',
   middleName: '',
-  agree: false,
   checked: { terms: false, pp: false },
-
 })
 
+const submitForm = async () => {
+  if (!form.checked.pp) {
+    alert('Необходимо согласиться с условиями использования')
+    return
+  }
 
-const submitForm = () => {
-  if (form.agree) {
-    console.log('Форма отправлена', form)
-    // Здесь можно добавить отправку данных на сервер
+  let initData = ''
+  if (import.meta.client) {
+    const tg = window.Telegram?.WebApp
+    initData = tg?.initData ?? ''
+  }
+
+  if (!initData) {
+    console.error('initData пустое')
+    return
+  }
+
+  try {
+    const { data, error } = await useFetch('/api/user', {
+      method: 'POST',
+      headers: {
+        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData ?? '',
+      },
+      body: {
+        last_name: form.lastName,
+        first_name: form.firstName,
+        middle_name: form.middleName,
+      },
+    })
+
+    if (error.value) {
+      console.error('Ошибка регистрации:', error.value)
+    } else {
+      console.log('Успешная регистрация:', data.value)
+    }
+  } catch (err) {
+    console.error('Ошибка запроса:', err)
   }
 }
 </script>
 
+
 <style scoped>
 .register-page {
-  background: #231F25;
+  background: #231F25 url('/img/bg_index.svg') no-repeat center 60px; /* сдвиг сверху */
+  background-size: cover;
   color: white;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
@@ -115,12 +149,10 @@ const submitForm = () => {
 .background-wrapper {
   flex: 1;
   display: flex;
-  padding: 3rem 1rem 5rem;
-  background-image: url('/img/lines-bg.svg');
-  background-repeat: no-repeat;
-  background-position: bottom; /* фон опущен вниз */
-  background-size: contain;
+  justify-content: center;
+  padding: 6rem 1rem;
 }
+
 .title {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
@@ -132,19 +164,16 @@ const submitForm = () => {
   margin-bottom: 2rem;
 }
 
-.container {
-  width: 100%;
-  max-width: 400px;
-}
+
 
 .title {
   font-family: 'Inter', sans-serif;
   font-weight: 500;
   font-style: normal;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 120%;
   letter-spacing: 0;
-  text-align: center;
+  text-align: left;
   margin-bottom: 2rem;
 }
 
@@ -181,13 +210,21 @@ const submitForm = () => {
   text-decoration: underline;
 }
 
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* кнопка внизу контейнера */
+  height: 100%; /* занимает весь доступный блок */
+  gap: 2rem; /* отступ между формой и кнопкой */
+}
+
 .submit-button {
   background-color: #f9b233;
-  color: black;
+  color: #231F25;
   padding: 0.75rem;
   border: none;
   border-radius: 0.5rem;
-  font-weight: bold;
+  font-weight: 500; /* тоньше текста */
   cursor: pointer;
   transition: background-color 0.3s;
 }
