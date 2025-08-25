@@ -28,94 +28,121 @@
             >Продать</button>
           </div>
 
-        <div class="form-group my-[13px] relative ">
-          <select
-              v-model="form.city"
-              :class="[
-      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
-      form.city === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
-    ]"
+        <!-- СЕЛЕКТ ГОРОДОВ -->
+        <div class="relative w-full dropdown-menu mt-[1rem]">
+          <button
+              @click="toggleCities"
+              class="flex h-[3rem] px-[1rem] justify-between items-center w-full bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] text-[16px] text-[#C1BFC6]"
           >
-            <!-- Плейсхолдер (не показывается в списке) -->
-            <option disabled value="" hidden>Город</option>
-
-            <!-- Список городов -->
-            <option
-                v-for="t in cities"
-                :key="t.id"
-                :value="t.id"
-                class="bg-[#1a171d] text-[#f5f5f5] hover:bg-[#2a272d]"
+            <span>{{ selectedCity?.value || 'Город' }}</span>
+            <svg
+                class="w-[16px] h-[16px] text-[#C1BFC6] transform transition-transform"
+                :class="{ 'rotate-180': isCityDropdownOpen }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
             >
-              {{ t.name }}
-            </option>
-          </select>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
 
-          <!-- Кастомная стрелка -->
-          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
-            <img src="/img/pticka_down.svg" />
+          <div
+              v-show="isCityDropdownOpen"
+              class="absolute left-0 top-[calc(100%+4px)] w-full bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] z-50"
+          >
+            <div
+                v-for="city in cities"
+                :key="city.id"
+                @click="selectCity(city)"
+                class="px-[16px] py-[12px] text-[16px] text-[#C1BFC6] hover:bg-[#2A2930] cursor-pointer"
+            >
+              {{ city.name }}
+            </div>
           </div>
         </div>
 
 
-
-        <!-- Адрес обменника -->
-        <div class="form-group my-[13px] relative">
-          <select
-              v-model="form.address"
-              :class="[
-      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
-      form.address === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
-    ]"
+        <!-- СЕЛЕКТ АДРЕСОВ -->
+        <div class="relative w-full dropdown-menu mt-[1rem]">
+          <button
+              @click="selectedCity && toggleBranches()"
+              class="flex h-[3rem] px-[1rem] justify-between items-center w-full bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] text-[16px] text-[#C1BFC6]"
           >
-            <option disabled value="" hidden>Адрес обменника</option>
-            <option
+            <span>{{ selectedBranch?.address || 'Адрес обменника' }}</span>
+            <svg
+                class="w-[16px] h-[16px] text-[#C1BFC6] transform transition-transform"
+                :class="{ 'rotate-180': isBranchDropdownOpen && selectedCity }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div
+              v-show="isBranchDropdownOpen && selectedCity"
+              class="absolute left-0 top-[calc(100%+4px)] w-full bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] z-50"
+          >
+            <div
                 v-for="branch in branches"
                 :key="branch.id"
-                :value="branch.id"
-                class="bg-[#1a171d] text-[#f5f5f5]"
+                @click="selectBranch(branch)"
+                class="px-[16px] py-[12px] text-[16px] text-[#C1BFC6] hover:bg-[#2A2930] cursor-pointer"
             >
               {{ branch.address }}
-            </option>
-          </select>
-
-          <!-- Кастомная стрелка -->
-          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
-            <img src="/img/pticka_down.svg" />
+            </div>
           </div>
         </div>
 
-        <!-- Тип заявки -->
-        <div class="form-group my-[13px] relative">
-          <select
-              v-model="form.type"
-              :class="[
-      'h-[40px] w-full bg-[#1a171d] border border-[#404040] rounded-[10px] px-[16px] pr-[40px] appearance-none focus:outline-none',
-      form.type === '' ? 'text-[#9C9C9C]' : 'text-[#f5f5f5]'
-    ]"
+
+        <!-- СЕЛЕКТ ТИПА ЗАЯВКИ -->
+        <div class="relative w-full dropdown-menu mt-[1rem] mb-[1rem]">
+          <button
+              @click="selectedBranch && toggleTypes()"
+              :disabled="!selectedBranch?.address"
+              class="flex h-[3rem] px-[1rem] justify-between items-center w-full
+             bg-[#1C1B20] border border-[#3F3D45] rounded-[8px]
+             text-[16px] text-[#C1BFC6]"
           >
-            <option disabled value="" hidden>Тип заявки</option>
-            <option
+            <span>{{ selectedType?.title || 'Тип заявки' }}</span>
+            <svg
+                class="w-[16px] h-[16px] text-[#C1BFC6] transform transition-transform"
+                :class="{ 'rotate-180': isTypeDropdownOpen }"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <!-- Выпадающий список -->
+          <div
+              v-show="isTypeDropdownOpen && selectedBranch"
+              class="absolute left-0 top-[calc(100%+4px)] w-full
+             bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] z-50"
+          >
+            <div
                 v-for="type in types"
                 :key="type.id"
-                :value="type.id"
-                class="bg-[#1a171d] text-[#f5f5f5]"
+                @click="selectType(type)"
+                class="px-[16px] py-[12px] text-[16px] text-[#C1BFC6]
+               hover:bg-[#2A2930] cursor-pointer"
             >
               {{ type.title }}
-            </option>
-          </select>
-
-          <!-- Кастомная стрелка -->
-          <div class="pointer-events-none absolute top-1/2 right-[16px] transform -translate-y-1/2 text-[#9c9c9c]">
-            <img src="/img/pticka_down.svg" />
+            </div>
           </div>
 
-          <!-- Подсказка -->
-          <p v-if="selectedType"
-             class="text-[12px] text-[#F5F5F5] mt-[8px] pb-[0.5rem]">
-            Лимит продажи — {{ selectedBranch?.order_limit || 0 }} RUB,
-            комиссия обменника — {{ currentRate }}%
-          </p>
+
         </div>
+
+        <!-- Подсказка -->
+        <p v-if="selectedType"
+           class="text-[12px] text-[#F5F5F5] mt-[8px] pb-[0.5rem] ">
+          Лимит продажи — {{ selectedBranch?.order_limit || 0 }} RUB,
+          комиссия обменника — {{ currentRate }}%
+        </p>
 
 
         <div class="bg-[#18141a] rounded-[12px] px-[16px] pt-[16px] pb-[24px] text-[#F5F5F5] text-[14px] font-inter">
@@ -272,6 +299,36 @@
 import { ref, onMounted, watch, computed } from 'vue'
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
+
+const isCityDropdownOpen = ref(false)
+const isBranchDropdownOpen = ref(false)
+const isTypeDropdownOpen = ref(false)
+
+const selectedCity = ref(null)
+
+
+const toggleCities = () => isCityDropdownOpen.value = !isCityDropdownOpen.value
+const toggleBranches = () => isBranchDropdownOpen.value = !isBranchDropdownOpen.value
+const toggleTypes = () => isTypeDropdownOpen.value = !isTypeDropdownOpen.value
+
+const selectCity = (city: any) => {
+  selectedCity.value = city
+  form.value.city = city.id
+  isCityDropdownOpen.value = false
+}
+
+const selectBranch = (branch: any) => {
+  selectedBranch.value = branch
+  form.value.address = branch.id
+  isBranchDropdownOpen.value = false
+}
+
+const selectType = (type: any) => {
+  selectedType.value = type
+  form.value.type = type.id
+  isTypeDropdownOpen.value = false
+}
+
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
