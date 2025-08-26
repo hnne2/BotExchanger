@@ -1,5 +1,5 @@
 export default defineNuxtPlugin(async () => {
-    const token = useCookie('auth_token', {
+    const token = useCookie('access_token', {
         sameSite: 'lax',
         path: '/',
     });

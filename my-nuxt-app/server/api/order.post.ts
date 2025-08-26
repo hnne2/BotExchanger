@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody, createError, H3Event } from 'h3'
+import { defineEventHandler, readBody, createError, H3Event, getCookie } from 'h3'
 
 interface OrderRequest {
     user_id: number
@@ -18,9 +18,15 @@ export default defineEventHandler<OrderResponse>(async (event: H3Event) => {
     try {
         const body = await readBody<OrderRequest>(event)
 
+        // читаем токен из куки
+        const token = getCookie(event, 'access_token')
+
         const response: OrderResponse = await $fetch(`${config.public.apiBase}/api/order`, {
             method: 'POST',
             body,
+            headers: token
+                ? { Authorization: `Bearer ${token}` }
+                : {},
         })
 
         return response

@@ -76,6 +76,12 @@
 import { reactive, ref } from 'vue'
 import AppHeader from '@/components/AppHeader.vue'
 
+// кука для токена
+const token = useCookie('access_token', {
+  sameSite: 'lax',
+  path: '/',
+})
+
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
 
@@ -102,7 +108,7 @@ const submitForm = async () => {
   if (!import.meta.client) return
 
   const tg = window.Telegram?.WebApp
-  tg?.ready() // важно вызвать, иначе initData может быть пустым
+  tg?.ready()
   const initData = tg?.initData ?? ''
 
   if (!initData) {
@@ -125,14 +131,25 @@ const submitForm = async () => {
 
     if (error.value) {
       console.error('Ошибка регистрации:', error.value)
+      alert('Ошибка регистрации: ' + (error.value?.message || 'Попробуйте снова'))
     } else {
       console.log('Успешная регистрация:', data.value)
+
+      // сохраняем access_token
+      if (data.value?.access_token) {
+        token.value = data.value.access_token
+      }
+
+      // редирект на главную
+      navigateTo('/')
     }
   } catch (err) {
     console.error('Ошибка запроса:', err)
+    alert('Ошибка запроса: ' + err.message)
   }
 }
 </script>
+
 
 
 

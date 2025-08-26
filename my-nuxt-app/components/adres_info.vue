@@ -4,7 +4,7 @@
       <!-- Название -->
       <h3 class="text-[1rem] font-semibold mb-[6px]">{{ title }}</h3>
       <p class="text-[0.875rem] text-[#9C9C9C] mb-[12px]">
-        {{ address }}
+        {{ address  }}
       </p>
 
       <!-- Время работы -->

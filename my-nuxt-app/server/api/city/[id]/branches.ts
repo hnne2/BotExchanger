@@ -6,6 +6,10 @@ interface Branch {
     city_id: number
     address: string
     working_hours: string
+    coords: {
+        latitude: number
+        longitude: number
+    }
 }
 
 export default defineEventHandler<Branch[]>(async (event) => {

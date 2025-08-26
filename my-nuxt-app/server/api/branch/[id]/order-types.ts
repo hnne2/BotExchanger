@@ -6,11 +6,18 @@ interface OrderType {
     name: string
     title: string
     description: string
-    rates: {
-        sell_rate: number
-        buy_rate: number
+    sell: {
+        rate: number
+        min: number
+        max: number
+    }
+    buy: {
+        rate: number
+        min: number
+        max: number
     }
 }
+
 
 export default defineEventHandler<OrderType[]>(async (event) => {
     const config = useRuntimeConfig()

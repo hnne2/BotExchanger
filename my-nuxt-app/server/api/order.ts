@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery } from 'h3'
+import { defineEventHandler, getQuery, getCookie, createError } from 'h3'
 
 interface Order {
     id: number
@@ -12,16 +12,19 @@ interface Order {
 
 export default defineEventHandler<Order>(async (event) => {
     const config = useRuntimeConfig()
-    const query = getQuery(event)
 
-    if (!query.id) {
+    // достаём токен из куки
+    const token = getCookie(event, 'access_token')
+    if (!token) {
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Missing "id" parameter'
+            statusCode: 401,
+            statusMessage: 'Не авторизован',
         })
     }
 
     return await $fetch<Order>(`${config.public.apiBase}/api/order`, {
-        query: { user_id: query.id }
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     })
 })

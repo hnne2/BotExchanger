@@ -137,11 +137,9 @@
 
         </div>
 
-        <!-- Подсказка -->
         <p v-if="selectedType"
            class="text-[12px] text-[#F5F5F5] mt-[8px] pb-[0.5rem] ">
-          Лимит продажи — {{ selectedBranch?.order_limit || 0 }} RUB,
-          комиссия обменника — {{ currentRate }}%
+          Лимиты: от {{ currentLimits.min }} до {{ currentLimits.max }} RUB <br> Комиссия обменника : {{ currentLimits.rate * 100 }}%
         </p>
 
 
@@ -471,12 +469,13 @@ const selectedType = computed(() => {
   return types.value.find(t => t.id === form.value.type)
 })
 
-// const currentRate = computed(() => {
-//   if (!selectedType.value) return null
-//   return mode.value === 'sell'
-//       ? selectedType.value.rates.sell_rate
-//       : selectedType.value.rates.buy_rate
-// })
+const currentLimits = computed(() => {
+  if (!selectedType.value) return { min: 0, max: 0 }
+
+  return mode.value === 'sell'
+      ? selectedType.value.sell
+      : selectedType.value.buy
+})
 
 const toAmount = computed(() => {
   if (!fromAmount.value) return '0.00'

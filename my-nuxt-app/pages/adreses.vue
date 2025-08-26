@@ -74,6 +74,7 @@
             v-for="branch in branches"
             :key="branch.id"
             :title="selectedCity.name"
+            :address="branch.address"
             :workingHours="branch.working_hours"
             :branch_id="branch.id"
             :city_id="selectedCity.id"
@@ -83,12 +84,13 @@
       <!-- КАРТА -->
 
     </div>
-    <div v-if="mode === 'cart' && selectedCity" class="" >
-      <Cart
-          v-if="mode === 'cart' && selectedCity && branches.length > 0"
-          :branches="branches"
-          :key="selectedCity.id"
-      />    </div>
+      <div v-if="mode === 'cart' && selectedCity">
+        <Cart
+            v-if="mode === 'cart' && selectedCity && branches.length > 0"
+            :branches="branches"
+            :key="selectedCity.id"
+        />
+      </div>
   </div>
   </div>
 </template>
@@ -141,7 +143,12 @@ const fetchCities = async () => {
 const fetchBranches = async (cityId) => {
   branches.value = []
   try {
-    branches.value = await $fetch(`/api/city/${cityId}/branches`)
+    const data = await $fetch(`/api/city/${cityId}/branches`)
+    // Преобразуем coords из объекта в массив
+    branches.value = data.map(b => ({
+      ...b,
+      coords: [b.coords.latitude, b.coords.longitude]
+    }))
   } catch (e) {
     console.error('Ошибка загрузки филиалов', e)
     branches.value = []

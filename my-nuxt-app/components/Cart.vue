@@ -3,12 +3,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+
+const props = defineProps<{
+  branches: {
+    id: number
+    name: string
+    address: string
+    working_hours: string
+    coords: [number, number]
+  }[]
+}>()
 
 const mapRef = ref<HTMLElement | null>(null)
-
-// координаты центра Пензы
-const PENZA_COORDS: [number, number] = [53.195873, 45.018316]
 
 onMounted(() => {
   const waitForYmaps = () => {
@@ -17,56 +24,59 @@ onMounted(() => {
         const ymaps = (window as any).ymaps
 
         const map = new ymaps.Map(mapRef.value, {
-          center: PENZA_COORDS,
+          center: props.branches[0].coords,
           zoom: 12,
           controls: ['zoomControl'],
         })
 
-        // тестовые плейсмарки в Пензе
-        const branches = [
-          {
-            id: 1,
-            name: 'Офис №1',
-            address: 'ул. Московская, д. 10',
-            working_hours: '09:00 - 18:00',
-            coords: [53.195873, 45.018316],
-          },
-          {
-            id: 2,
-            name: 'Офис №2',
-            address: 'пр. Строителей, д. 5',
-            working_hours: '10:00 - 19:00',
-            coords: [53.2034, 45.0128],
-          },
-        ]
-
-        branches.forEach((branch) => {
+        props.branches.forEach((branch) => {
           const placemark = new ymaps.Placemark(
               branch.coords,
               {
                 balloonContent: `
-                <div style="background:#1e1e1e;color:white;padding:10px;border-radius:12px;">
-                  <h3 style="margin-bottom:8px;font-size:16px;">${branch.name}</h3>
-                  <p style="margin-bottom:8px;font-size:14px;">${branch.address}</p>
-                  <p style="margin-bottom:8px;color:#ccc;font-size:14px;">
-                    <b>Время работы:</b> ${branch.working_hours}
-                  </p>
-                </div>
-                 <div class="flex gap-[12px] w-full pb-[1rem]">
-        <button
-            @click="goToExchange"
-            class="flex-1 px-[16px] py-[10px] bg-[#F4B44D] hover:bg-yellow-600 text-black font-medium rounded-[0.5rem] transition"
-        >
-          Создать заявку
-        </button>
-        <button
-            @click="goToInfo"
-            class="flex-1 px-[16px] py-[10px] bg-transparent border border-[#F4B44D] text-[#F4B44D] hover:bg-yellow-500 hover:text-black font-medium rounded-[0.5rem] transition"
-        >
-          Подробнее
-        </button>
-      </div>
-              `,
+        <div style="
+          background-color: #1e1e1e;
+          color: white;
+          padding-bottom: 10px;
+          padding-left: 10px;
+          padding-right: 2px;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 400px;
+          box-sizing: border-box;
+        ">
+           <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.name}</h3>
+          <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.address}</h3>
+          <p style="margin-bottom: 16px; color: #ccc; font-size: 14px;">
+            <b>Время работы:</b> ${branch.working_hours}
+          </p>
+          <div style="display: flex; gap: 10px;">
+            <button style="
+              flex: 1;
+              padding: 10px;
+              background-color: #F4B44D;
+              color: #231F25;
+              font-weight: 500;
+              border: none;
+              border-radius: 8px;
+              cursor: pointer;
+            ">
+              Создать заявку
+            </button>
+            <button style="
+              flex: 1;
+              padding: 10px;
+              background-color: transparent;
+              color: #F4B44D;
+              border: 1px solid #F4B44D;
+              border-radius: 8px;
+              cursor: pointer;
+            ">
+              Подробнее
+            </button>
+          </div>
+        </div>
+      `,
               },
               {
                 preset: 'islands#redIcon',
@@ -84,9 +94,7 @@ onMounted(() => {
 
   waitForYmaps()
 })
-
 </script>
-
 
 <style scoped>
 .ymap-container {
@@ -161,7 +169,6 @@ onMounted(() => {
   color: #cccccc;
   margin-bottom: 16px;
 }
-
 :global(.balloon-buttons) {
   display: flex;
   gap: 8px;
@@ -199,3 +206,4 @@ onMounted(() => {
 }
 
 </style>
+

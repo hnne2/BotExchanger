@@ -104,7 +104,7 @@ interface Order {
 // запрос к API
 onMounted(async () => {
   try {
-    const data = await $fetch<Order[]>('/api/order/:id', { query: { id: 1 } })
+    const data = await $fetch<Order[]>('/api/order/')
     orders.value = data
   } catch (e) {
     console.error('Ошибка при загрузке заявок:', e)

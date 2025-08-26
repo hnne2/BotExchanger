@@ -6,7 +6,6 @@ interface BranchDetail {
     city_id: number
     address: string
     working_hours: string
-    order_limit: number
     coords: {
         latitude: number
         longitude: number

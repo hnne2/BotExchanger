@@ -1,4 +1,4 @@
-import {defineEventHandler, getQuery, getRouterParam} from 'h3'
+import { defineEventHandler, getQuery, getRouterParam, getCookie } from 'h3'
 
 
 interface Order {
@@ -32,7 +32,12 @@ export default defineEventHandler<Order>(async (event) => {
         })
     }
 
+    // читаем токен из куки
+    const token = getCookie(event, 'access_token')
+
     return await $fetch<Order>(`${config.public.apiBase}/api/order/${orderId}`, {
-        query: { user_id: query.id }
+        headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : {},
     })
 })
