@@ -32,7 +32,7 @@
 
         <div class="mes mt-[13px] space-y-[12px]">
           <button
-              class="w-full bg-[#F4B44D] hover:bg-[#e0a73f] text-black  py-[10px] rounded-[8px] text-[14px]"
+              class="w-full bg-[#F4B44D] border-transparent hover:bg-[#e0a73f] text-black  py-[10px] rounded-[8px] text-[14px]"
               @click="$router.push('/exchange')"
           >
             Создать ещё заявку
@@ -96,7 +96,7 @@ const togglePushes = () => {
 }
 const route = useRoute()
 
-const success = route.query.success===true
+const success = route.query.success === 'true'
 const orderId = route.query.order || ''
 </script>
 <style >

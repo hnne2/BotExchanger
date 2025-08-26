@@ -37,7 +37,7 @@ export default defineEventHandler<Order>(async (event) => {
 
     return await $fetch<Order>(`${config.public.apiBase}/api/order/${orderId}`, {
         headers: token
-            ? { Authorization: `Bearer ${token}` }
+            ? { 'X-Telegram-Api-Key': `Bearer ${token}` }
             : {},
     })
 })

@@ -1,11 +1,19 @@
 import { defineEventHandler, readBody, createError, H3Event, getCookie } from 'h3'
 
 interface OrderRequest {
+    type: 'buy' | 'sell'
     user_id: number
     branch_id: number
     order_type_id: number
+    rate: number
     amount: number
-    type: 'buy' | 'sell'
+    crypto_amount: number
+    commission: number
+    commission_amount: number
+    wallet: string
+    name: string
+    surname: string
+    patronymic: string
 }
 
 interface OrderResponse {
@@ -20,12 +28,13 @@ export default defineEventHandler<OrderResponse>(async (event: H3Event) => {
 
         // читаем токен из куки
         const token = getCookie(event, 'access_token')
+        console.log(token)
 
         const response: OrderResponse = await $fetch(`${config.public.apiBase}/api/order`, {
             method: 'POST',
             body,
             headers: token
-                ? { Authorization: `Bearer ${token}` }
+                ? { 'X-Telegram-Api-Key': `Bearer ${token}` }
                 : {},
         })
 

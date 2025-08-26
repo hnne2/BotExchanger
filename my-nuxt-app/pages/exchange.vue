@@ -34,7 +34,7 @@
               @click="toggleCities"
               class="flex h-[3rem] px-[1rem] justify-between items-center w-full bg-[#1C1B20] border border-[#3F3D45] rounded-[8px] text-[16px] text-[#C1BFC6]"
           >
-            <span>{{ selectedCity?.value || 'Город' }}</span>
+            <span>{{ selectedCity?.name || 'Город' }}</span>
             <svg
                 class="w-[16px] h-[16px] text-[#C1BFC6] transform transition-transform"
                 :class="{ 'rotate-180': isCityDropdownOpen }"
@@ -360,23 +360,41 @@ async function submitOrder() {
       !wallet.value ||
       !form.value.lastName ||
       !form.value.firstName ||
-      !form.value.middleName ||
       !form.value.checked.terms ||
       !form.value.checked.pp
   ) {
-    alert('Пожалуйста, заполните все поля и согласитесь с условиями')
+    alert('Пожалуйста, заполните все обязательные поля и согласитесь с условиями')
     return
   }
 
   try {
+    // вычисляем значения
+    const rate = mode.value === 'buy' ? rates.value.buy : rates.value.sell
+    const cryptoAmount =
+        mode.value === 'buy'
+            ? fromAmount.value / rate
+            : fromAmount.value * rate
+
+    const commission = currentLimits.value.rate // комиссия в долях (например 0.05)
+    const commissionAmount = fromAmount.value * commission
+
     const payload = {
-      user_id: 1,
+      type: mode.value, // "buy" или "sell"
+      user_id: 1, // TODO: заменить на реального пользователя
       branch_id: form.value.address,
       order_type_id: form.value.type,
+      rate: rate,
       amount: fromAmount.value,
-      type: mode.value,
-      order_status_id: 1
+      crypto_amount: Number(cryptoAmount.toFixed(6)),
+      commission: commission * 100, // в процентах
+      commission_amount: Number(commissionAmount.toFixed(2)),
+      wallet: wallet.value,
+      name: form.value.firstName,
+      surname: form.value.lastName,
+      patronymic: form.value.middleName || ''
     }
+
+    console.log('Payload:', payload)
 
     const response = await $fetch<{ order_id: number }>('/api/order', {
       method: 'POST',
@@ -396,6 +414,7 @@ async function submitOrder() {
     })
   }
 }
+
 
 
 interface RatesResponse {

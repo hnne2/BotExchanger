@@ -98,7 +98,6 @@ const form = reactive({
   middleName: '',
   checked: { terms: false, pp: false },
 })
-
 const submitForm = async () => {
   if (!form.checked.pp) {
     alert('Необходимо согласиться с условиями использования')
@@ -113,7 +112,7 @@ const submitForm = async () => {
 
   if (!initData) {
     console.error('initData пустое — форма должна открываться в Telegram Mini App')
-    return
+    return navigateTo('/error')
   }
 
   try {
@@ -131,7 +130,7 @@ const submitForm = async () => {
 
     if (error.value) {
       console.error('Ошибка регистрации:', error.value)
-      alert('Ошибка регистрации: ' + (error.value?.message || 'Попробуйте снова'))
+      return navigateTo('/error')
     } else {
       console.log('Успешная регистрация:', data.value)
 
@@ -145,9 +144,10 @@ const submitForm = async () => {
     }
   } catch (err) {
     console.error('Ошибка запроса:', err)
-    alert('Ошибка запроса: ' + err.message)
+    return navigateTo('/error')
   }
 }
+
 </script>
 
 
@@ -200,16 +200,22 @@ const submitForm = async () => {
   flex-direction: column;
   gap: 1rem;
 }
-
 .input {
   padding: 0.75rem;
-  border: 1px solid #404040; /* цвет бордера изменен */
+  border: 1px solid #404040;
   border-radius: 0.5rem;
   background: transparent;
   color: white;
+  outline: none; /* убираем второй бордер */
 }
+
 .input::placeholder {
   color: rgba(255, 255, 255, 0.5);
+}
+
+.input:focus {
+  border-color: #f9b233; /* подсветка при фокусе */
+  outline: none; /* точно убираем стандартный синий */
 }
 
 .checkbox {

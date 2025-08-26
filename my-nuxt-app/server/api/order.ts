@@ -15,6 +15,7 @@ export default defineEventHandler<Order>(async (event) => {
 
     // достаём токен из куки
     const token = getCookie(event, 'access_token')
+    console.log(token)
     if (!token) {
         throw createError({
             statusCode: 401,
@@ -23,8 +24,8 @@ export default defineEventHandler<Order>(async (event) => {
     }
 
     return await $fetch<Order>(`${config.public.apiBase}/api/order`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: token
+            ? { 'X-Telegram-Api-Key': `Bearer ${token}` }
+            : {},
     })
 })
