@@ -1,4 +1,4 @@
-export default defineNuxtPlugin(async () => {
+export default defineNuxtPlugin(async (nuxtApp) => {
     const token = useCookie('auth_token', {
         sameSite: 'lax',
         path: '/',
@@ -6,7 +6,6 @@ export default defineNuxtPlugin(async () => {
 
     const config = useRuntimeConfig()
 
-    // Функция для проверки валидности токена
     const isTokenValid = async () => {
         if (!token.value) return false;
 
@@ -38,7 +37,8 @@ export default defineNuxtPlugin(async () => {
     }
 
     if (!initData) {
-        return;
+        // если initData нет → сразу на регистрацию
+        return navigateTo('/registration');
     }
 
     const { data } = await useFetch(`${config.public.apiBase}/api/order`, {
@@ -47,7 +47,11 @@ export default defineNuxtPlugin(async () => {
             'X-Telegram-Init-Data': initData,
         },
     });
+
     if (data.value?.access_token) {
         token.value = data.value.access_token;
+    } else {
+        // если не получили токен → на регистрацию
+        return navigateTo('/registration');
     }
 });
