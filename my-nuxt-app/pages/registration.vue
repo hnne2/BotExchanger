@@ -17,7 +17,7 @@
       <div class="container ">
         <h1 class="title text-left">Завершите процесс<br />регистрации</h1>
 
-        <form @submit.prevent="submitForm" class="form ">
+        <form @submit.prevent="submitForm" class="form flex flex-col min-h-[60vh]">
           <input
               v-model="form.lastName"
               type="text"
@@ -63,10 +63,10 @@
           </div>
           <button
               type="submit"
-              class="submit-button fixed left-1/2 transform -translate-x-1/2 bottom-[2rem] w-[90%] max-w-[400px]"
+              class="submit-button w-[90%] max-w-[400px] mx-auto mt-auto mb-[2rem]"
           >
             Продолжить
-          </button>        </form>
+          </button>      </form>
       </div>
     </div>
   </div>
