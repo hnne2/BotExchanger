@@ -1,4 +1,4 @@
-export default defineNuxtPlugin(async (nuxtApp) => {
+export default defineNuxtPlugin(async () => {
     const token = useCookie('auth_token', {
         sameSite: 'lax',
         path: '/',
@@ -6,6 +6,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
     const config = useRuntimeConfig()
 
+    // Проверка токена
     const isTokenValid = async () => {
         if (!token.value) return false;
 
@@ -29,29 +30,33 @@ export default defineNuxtPlugin(async (nuxtApp) => {
 
     token.value = null;
 
-    let initData: string = '';
+    if (!import.meta.client) return;
 
-    if (import.meta.client) {
-        const tg = window.Telegram?.WebApp;
-        initData = tg?.initData ?? '';
-    }
+    const tg = window.Telegram?.WebApp;
+    tg?.ready(); // важно вызвать, чтобы Telegram корректно отдал initData
+
+    const initData = tg?.initData ?? '';
 
     if (!initData) {
-        // если initData нет → сразу на регистрацию
+        // если нет initData → сразу редиректим на регистрацию
         return navigateTo('/registration');
     }
 
-    const { data } = await useFetch(`${config.public.apiBase}/api/order`, {
-        method: 'POST',
-        headers: {
-            'X-Telegram-Init-Data': initData,
-        },
-    });
+    try {
+        const { data } = await useFetch(`${config.public.apiBase}/api/order`, {
+            method: 'POST',
+            headers: {
+                'X-Telegram-Init-Data': initData,
+            },
+        });
 
-    if (data.value?.access_token) {
-        token.value = data.value.access_token;
-    } else {
-        // если не получили токен → на регистрацию
+        if (data.value?.access_token) {
+            token.value = data.value.access_token;
+        } else {
+            return navigateTo('/registration');
+        }
+    } catch (err) {
+        console.error('Ошибка получения токена:', err);
         return navigateTo('/registration');
     }
 });

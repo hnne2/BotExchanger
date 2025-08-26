@@ -99,14 +99,14 @@ const submitForm = async () => {
     return
   }
 
-  let initData = ''
-  if (import.meta.client) {
-    const tg = window.Telegram?.WebApp
-    initData = tg?.initData ?? ''
-  }
+  if (!import.meta.client) return
+
+  const tg = window.Telegram?.WebApp
+  tg?.ready() // важно вызвать, иначе initData может быть пустым
+  const initData = tg?.initData ?? ''
 
   if (!initData) {
-    console.error('initData пустое')
+    console.error('initData пустое — форма должна открываться в Telegram Mini App')
     return
   }
 
@@ -114,7 +114,7 @@ const submitForm = async () => {
     const { data, error } = await useFetch('/api/user', {
       method: 'POST',
       headers: {
-        'X-Telegram-Init-Data': window.Telegram?.WebApp?.initData ?? '',
+        'X-Telegram-Init-Data': initData,
       },
       body: {
         last_name: form.lastName,
@@ -133,6 +133,7 @@ const submitForm = async () => {
   }
 }
 </script>
+
 
 
 <style scoped>
