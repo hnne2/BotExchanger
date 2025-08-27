@@ -139,7 +139,8 @@
 
         <p v-if="selectedType"
            class="text-[12px] text-[#F5F5F5] mt-[8px] pb-[0.5rem] ">
-          Лимиты: от {{ currentLimits.min }} до {{ currentLimits.max }} RUB <br> Комиссия обменника : {{ currentLimits.rate * 100 }}%
+          Лимиты: от {{ currentLimits.min }} до {{ currentLimits.max }} RUB <br>Комиссия обменника : {{ currentLimits.rate }}%
+
         </p>
 
 
@@ -414,9 +415,8 @@ async function submitOrder() {
             ? fromAmount.value / rate
             : fromAmount.value * rate
 
-    const commission = currentLimits.value.rate // комиссия в долях (например 0.05)
-    const commissionAmount = fromAmount.value * commission
-
+    const commission = currentLimits.value.rate
+    const commissionAmount = fromAmount.value * (commission / 100)
     const payload = {
       type: mode.value, // "buy" или "sell"
       branch_id: form.value.address,
@@ -424,7 +424,7 @@ async function submitOrder() {
       rate: rate,
       amount: fromAmount.value,
       crypto_amount: Number(cryptoAmount.toFixed(6)),
-      commission: commission * 100, // в процентах
+      commission: commission,
       commission_amount: Number(commissionAmount.toFixed(2)),
       wallet: wallet.value,
       name: form.value.firstName,
@@ -510,7 +510,7 @@ const cities = ref<any[]>([])
 const branches = ref<any[]>([])
 const types = ref<any[]>([])
 const selectedBranch = ref<Record<string, any>>({})
-const rates = ref<RatesResponse>({ buy: 0, sell: 0 }) // ✅ дефолтное значение
+const rates = ref<RatesResponse>({ buy: 0, sell: 0 })
 
 /** =========================
  * 4. Вычисляемые значения
@@ -538,15 +538,13 @@ const toAmount = computed(() => {
   if (!fromAmount.value) return '0.00'
 
   const rate = mode.value === 'buy' ? rates.value.buy : rates.value.sell
-  const commission = currentLimits.value?.rate || 0  // если не выбрали обменник, комиссия = 0
+  const commission = (currentLimits.value?.rate || 0) / 100
 
   let result = 0
 
   if (mode.value === 'buy') {
-    // Покупка USDT за рубли → делим на курс и вычитаем комиссию
     result = (fromAmount.value / rate) * (1 - commission)
   } else {
-    // Продажа USDT → умножаем на курс и вычитаем комиссию
     result = (fromAmount.value * rate) * (1 - commission)
   }
 

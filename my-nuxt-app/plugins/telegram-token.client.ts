@@ -6,7 +6,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     const tg = window.Telegram?.WebApp ?? null
     tg?.ready()
 
-     const initData = tg?.initData ?? '';
+    const initData = tg?.initData ?? '';
 
 
     const fetchToken = async () => {
