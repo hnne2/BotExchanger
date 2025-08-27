@@ -8,7 +8,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     const initData = tg?.initData ?? '';
 
-
     const fetchToken = async () => {
         if (!initData) return false
 

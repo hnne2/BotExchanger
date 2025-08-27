@@ -560,12 +560,21 @@ watch(fromAmount, (value) => {
   }
 
   const limits = currentLimits.value
-  if (value < limits.min || value > limits.max) {
+  let amountInRub = 0
+
+  if (mode.value === 'buy') {
+    amountInRub = value
+  } else {
+    amountInRub = value * rates.value.sell
+  }
+
+  if (amountInRub < limits.min || amountInRub > limits.max) {
     errorMessage.value = `Сумма должна быть от ${limits.min} до ${limits.max} RUB`
   } else {
     errorMessage.value = ''
   }
 })
+
 
 /** =========================
  * 5. Методы

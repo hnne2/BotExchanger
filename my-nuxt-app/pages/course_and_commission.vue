@@ -115,8 +115,7 @@
               <!-- Покупка (в начале) -->
               <div class="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
                 <div class="text-[#F4B44D] text-[20px] font-semibold leading-none">
-<!--                  {{ type.rates.buy_rate }}%-->
-                  30%
+                  {{ type.buy?.rate ?? '-' }}
                 </div>
                 <div class="text-[#C1BFC6] mt-[4px]">Покупка</div>
               </div>
@@ -124,8 +123,7 @@
               <!-- Продажа (чуть правее центра) -->
               <div class="absolute left-[55%] top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
                 <div class="text-[#F4B44D] text-[20px] font-semibold leading-none">
-<!--                  {{ type.rates.sell_rate }}%-->
-                  30%
+                  {{ type.sell?.rate ?? '-' }}
                 </div>
                 <div class="text-[#C1BFC6] mt-[4px]">Продажа</div>
               </div>

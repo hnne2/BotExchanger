@@ -11,8 +11,8 @@
         >
           {{ statusLabel }}
         </span>
-        <span class="text-[14px] text-[#F5F5F5] opacity-80 uppercase">
-          {{ order.type }}
+        <span class="text-[14px] text-[#F5F5F5] opacity-80 ">
+          {{ typeLabel }}
         </span>
       </div>
 
@@ -22,7 +22,12 @@
           Заявка {{ order.id }}
         </p>
         <p class="text-[16px] font-semibold text-[#F4B44D]">
-          ${{ order.amount }} / {{ order.crypto_amount }} USDT
+          <template v-if="order.type === 'buy'">
+            {{ order.amount }} ₽ / {{ order.crypto_amount }} USDT
+          </template>
+          <template v-else>
+            {{ order.crypto_amount }} USDT / {{ order.amount }} ₽
+          </template>
         </p>
       </div>
 
@@ -80,15 +85,18 @@ const statusClass = computed(() => {
   }
 })
 
-// формат даты
+// формат даты (только dd.mm.yyyy)
 const formattedDate = computed(() => {
   const d = new Date(order.created_at)
-  return d.toLocaleString('ru-RU', {
+  return d.toLocaleDateString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    year: 'numeric'
   })
+})
+
+// перевод типа заявки
+const typeLabel = computed(() => {
+  return order.type === 'buy' ? 'Покупка' : 'Продажа'
 })
 </script>
