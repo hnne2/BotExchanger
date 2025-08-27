@@ -2,7 +2,7 @@
   <transition name="slide">
     <div
         v-if="visible"
-        class="fixed inset-0 z-[9999] w-screen h-screen bg-[#231f25] bg-no-repeat bg-cover bg-[url('/img/Rectangle.svg')] overflow-y-auto overflow-x-hidden"
+        class="fixed inset-0 z-[100000] w-screen h-screen bg-[#231f25] bg-no-repeat bg-cover bg-[url('/img/Rectangle.svg')] overflow-y-auto overflow-x-hidden"
     >
       <div class="min-h-screen w-full box-border">
         <slot />
