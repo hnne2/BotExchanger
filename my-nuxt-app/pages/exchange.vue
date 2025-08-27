@@ -149,8 +149,9 @@
           <div class="flex justify-between items-center mb-[12px]">
             <span class="text-[#F4B44D] font-medium text-[13px]">Отдаю</span>
             <span class="text-[#AAAAAA] text-[12px]">
-  1 RUB = {{ displayRate }} USDT
-</span>          </div>
+                  1 USDT = {{ displayRate}} ₽
+            </span>
+          </div>
 
           <!-- Отдаю -->
           <div class="flex items-center gap-[8px]">

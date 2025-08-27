@@ -196,6 +196,8 @@ const statusLabel = computed(() => {
       return 'Подтверждена'
     case 3:
       return 'Отклонена'
+    case 4:
+      return 'Исполнена'
     default:
       return 'Неизвестно'
   }
