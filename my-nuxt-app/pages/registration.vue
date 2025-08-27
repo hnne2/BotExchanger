@@ -1,19 +1,21 @@
 <template>
   <div class="register-page">
+    <div
+        class="bg-gradient-to-b from-[#231F25] to-[#2d2830] shadow-[0_2px_10px_rgba(0,0,0,0.4)] flex items-center justify-center"
+    >
+      <!-- Заголовок / логотип -->
+      <div class="logo  p-[0.7rem]">
+        <img
+            src="/img/header_criptogex.svg"
+            alt="Crypto Gex"
+            class="logo"
+        />
+      </div>
+
+    </div>
+
     <div class=" flex flex-col ">
-      <AppHeader
-          @toggle-menu="toggleMenu"
-          @toggle-pushes="togglePushes"
-      />
-      <MenuDrawer :visible="menuOpen">
-        <Menu @close="toggleMenu" />
-      </MenuDrawer>
-
-      <MenuDrawer :visible="pushesOpen">
-        <Pushes @close="togglePushes" />
-      </MenuDrawer>
-
-    <div class="background-wrapper">
+      <div class="background-wrapper">
       <div class="container ">
         <h1 class="title text-left">Завершите процесс<br />регистрации</h1>
 
@@ -93,15 +95,7 @@ const token = useCookie('access_token', {
   path: '/',
 })
 
-const pushesOpen = ref(false)
-const menuOpen = ref(false)
 
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value
-}
-const togglePushes = () => {
-  pushesOpen.value = !pushesOpen.value
-}
 
 const form = reactive({
   lastName: '',
