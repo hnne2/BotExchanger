@@ -24,14 +24,15 @@
               placeholder="Фамилия*"
               class="input"
               required
+              @input="form.lastName = form.lastName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
           />
-
           <input
               v-model="form.firstName"
               type="text"
               placeholder="Имя*"
               class="input"
               required
+              @input="form.firstName = form.firstName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
           />
 
           <input
@@ -39,6 +40,7 @@
               type="text"
               placeholder="Отчество (при наличии)"
               class="input"
+              @input="form.middleName = form.middleName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
           />
 
           <div class="flex items-center gap-[8px]">
@@ -59,7 +61,16 @@
               </div>
             </div>
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem]">
-              Я соглашаюсь с Условиями использования мини-приложения            </div>
+              Я соглашаюсь с
+              <a
+                  href="https://example.com/terms"
+                  target="_blank"
+                  class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2"
+              >
+                Условиями использования
+              </a>
+              мини-приложения
+            </div>
           </div>
           <button
               type="submit"
@@ -108,7 +119,9 @@ const submitForm = async () => {
 
   const tg = window.Telegram?.WebApp
   tg?.ready()
-  const initData = tg?.initData ?? ''
+  // const initData = tg?.initData ?? '';
+  const initData = 'query_id=AAEo8vo2AAAAACjy-jYbiqsk&user=%7B%22id%22%3A922415656%2C%22first_name%22%3A%22Gri%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22hnne2%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2FzorMNnw2jONg3vEhC0fcCsKQVn4kFJP7tPDIWfMuEb8.svg%22%7D&auth_date=1756210764&signature=3ZryenTgue1dQydXiAFIic0U68emau-mCLmBXyqyVeuHAMKxikS24xV7YjWTxhsq7HtgqeTsgCItjkB0ByTMAA&hash=ef213e5cc3a8fc05e8cf6270e3e546867d02fb7b9ef1a621b76746331ea327e3'
+
 
   if (!initData) {
     console.error('initData пустое — форма должна открываться в Telegram Mini App')
@@ -126,27 +139,33 @@ const submitForm = async () => {
         first_name: form.firstName,
         middle_name: form.middleName,
       },
+      throw: false,
     })
+
+    // проверка на 409
+    if (data.value?.statusCode === 409 || error.value?.statusCode === 409) {
+      console.log('Пользователь уже существует — редирект на главную')
+      return navigateTo('/')
+    }
 
     if (error.value) {
       console.error('Ошибка регистрации:', error.value)
       return navigateTo('/error')
-    } else {
-      console.log('Успешная регистрация:', data.value)
-
-      // сохраняем access_token
-      if (data.value?.access_token) {
-        token.value = data.value.access_token
-      }
-
-      // редирект на главную
-      navigateTo('/')
     }
+
+    console.log('Успешная регистрация:', data.value)
+
+    if (data.value?.access_token) {
+      token.value = data.value.access_token
+    }
+
+    navigateTo('/')
   } catch (err) {
     console.error('Ошибка запроса:', err)
     return navigateTo('/error')
   }
 }
+
 
 </script>
 

@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import OrderCard from '~/components/OrderCard.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const pushesOpen = ref(false)
 const menuOpen = ref(false)
@@ -81,6 +81,7 @@ const mode = ref<'active' | 'archive'>('active')
 const filter = ref<'all' | 'buy' | 'sell'>('all')
 
 const orders = ref<Order[]>([])
+const loading = ref(false)
 
 interface Order {
   id: number
@@ -101,28 +102,35 @@ interface Order {
   rejectReason: string | null
 }
 
-// запрос к API
-onMounted(async () => {
+// функция загрузки
+const loadOrders = async () => {
+  loading.value = true
   try {
-    const data = await $fetch<Order[]>('/api/order/')
+    const url = mode.value === 'active' ? '/api/order/' : '/api/order/archive'
+    const data = await $fetch<Order[]>(url)
     orders.value = data
   } catch (e) {
     console.error('Ошибка при загрузке заявок:', e)
+  } finally {
+    loading.value = false
   }
-})
+}
+
+// загружаем при первом монтировании
+onMounted(loadOrders)
+// и при переключении вкладки
+watch(mode, loadOrders)
 
 // фильтрация
 const filteredOrders = computed(() => {
   return orders.value.filter(order => {
-    // считаем order_status_id === 1 → активная, иначе → архив
-    const isActive = order.order_status_id === 1
-    const matchesTab = mode.value === 'active' ? isActive : !isActive
     const matchesFilter =
         filter.value === 'all' || order.type === filter.value
-    return matchesTab && matchesFilter
+    return matchesFilter
   })
 })
 </script>
+
 
 <style scoped>
 .toggle-group {

@@ -65,8 +65,9 @@
       </div>
       <div class="flex border-b border-[#404040] pb-[8px]">
         <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">Тип заявки</span>
-        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.type }}</span>
-      </div>
+        <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">
+  {{ order.type === 'buy' ? 'Покупка' : 'Продажа' }}
+</span>      </div>
 
       <div class="flex  border-b border-[#404040] pb-[8px]">
         <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">Курс</span>

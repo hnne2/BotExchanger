@@ -1,2 +1,2 @@
-User-Agent: *
+IndexGet-Agent: *
 Disallow:

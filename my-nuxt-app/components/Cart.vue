@@ -34,55 +34,38 @@ onMounted(() => {
               branch.coords,
               {
                 balloonContent: `
-        <div style="
-          background-color: #1e1e1e;
-          color: white;
-          padding-bottom: 10px;
-          padding-left: 10px;
-          padding-right: 2px;
-          border-radius: 16px;
-          width: 100%;
-          max-width: 400px;
-          box-sizing: border-box;
-        ">
-           <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.name}</h3>
-          <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.address}</h3>
-          <p style="margin-bottom: 16px; color: #ccc; font-size: 14px;">
-            <b>Время работы:</b> ${branch.working_hours}
-          </p>
-          <div style="display: flex; gap: 10px;">
-            <button style="
-              flex: 1;
-              padding: 10px;
-              background-color: #F4B44D;
-              color: #231F25;
-              font-weight: 500;
-              border: none;
-              border-radius: 8px;
-              cursor: pointer;
-            ">
-              Создать заявку
-            </button>
-            <button style="
-              flex: 1;
-              padding: 10px;
-              background-color: transparent;
-              color: #F4B44D;
-              border: 1px solid #F4B44D;
-              border-radius: 8px;
-              cursor: pointer;
-            ">
-              Подробнее
-            </button>
-          </div>
+      <div style="
+        background-color: #1e1e1e;
+        color: white;
+        padding: 10px 12px;
+        border-radius: 16px;
+        max-width: 400px;
+        box-sizing: border-box;
+      ">
+        <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.name}</h3>
+        <h3 style="margin-bottom: 8px; font-size: 16px;">${branch.address}</h3>
+        <p style="margin-bottom: 16px; color: #ccc; font-size: 14px;">
+          <b>Время работы:</b> ${branch.working_hours}
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button style="flex: 1; padding: 10px 20px; background-color: #F4B44D; color: #231F25; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; text-overflow: ellipsis;"
+            onclick="window.goToExchange(${branch.id}, ${branch.city_id})"
+          >Создать заявку</button>
+
+          <button style="flex: 1; padding: 10px 20px; background-color: transparent; color: #F4B44D; border: 1px solid #F4B44D; border-radius: 8px; cursor: pointer; white-space: nowrap; text-overflow: ellipsis;"
+            onclick="window.goToInfo(${branch.id}, ${branch.city_id})"
+          >Подробнее</button>
         </div>
-      `,
+      </div>
+    `
               },
               {
                 preset: 'islands#redIcon',
                 balloonPanelMaxMapArea: 0,
               }
           )
+
+
 
           map.geoObjects.add(placemark)
         })
@@ -94,6 +77,22 @@ onMounted(() => {
 
   waitForYmaps()
 })
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+window.goToExchange = (branchId: number, cityId: number) => {
+  router.push({
+    path: '/exchange',
+    query: { branch_id: branchId, city_id: cityId }
+  })
+}
+
+window.goToInfo = (branchId: number, cityId: number) => {
+  router.push({
+    path: '/course_and_commission',
+    query: { branch_id: branchId, city_id: cityId }
+  })
+}
 </script>
 
 <style scoped>

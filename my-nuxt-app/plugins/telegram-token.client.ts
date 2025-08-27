@@ -43,6 +43,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     // Получаем токен сразу при загрузке
     fetchToken()
 
-    // Обновляем токен каждые 5 секунд
+    // Обновляем токен
     setInterval(fetchToken, 10000)
 })

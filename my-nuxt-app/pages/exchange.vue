@@ -167,6 +167,9 @@
               {{ mode === 'buy' ? 'RUB' : 'USDT' }}
             </div>
           </div>
+          <div v-if="errorMessage" class="text-red-500 text-[12px] mt-[10px]">
+            {{ errorMessage }}
+          </div>
 
           <!-- Получаю -->
           <div class="text-[#F4B44D] font-medium text-[13px] mt-[20px] mb-[12px]">
@@ -193,7 +196,8 @@
               v-model="wallet"
               type="text"
               placeholder="Кошелек TRC-20"
-              class="flex-1 bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-[8px] [padding-left:16px] [padding-right:16px] [padding-top:13px] [padding-bottom:13px] outline-none"
+              @input="wallet = wallet.replace(/[^a-zA-Z0-9]/g, '')"
+              class="flex-1 bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-[8px] px-[16px] py-[13px] outline-none"
           />
           <button
               @click="pasteFromClipboard"
@@ -209,8 +213,10 @@
               v-model="form.lastName"
               type="text"
               placeholder="Фамилия*"
-              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+              @input="form.lastName = form.lastName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
+              class="h-[30px] bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
+
         </div>
 
         <div class=" flex form-group my-[13px]  ">
@@ -218,27 +224,30 @@
               v-model="form.firstName"
               type="text"
               placeholder="Имя*"
-              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+              @input="form.firstName = form.firstName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
+              class="h-[30px] bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
 
-        <div class=" flex form-group my-[13px]  ">
+        <div class=" flex form-group my-[13px]">
           <input
               v-model="form.middleName"
               type="text"
               placeholder="Отчество (при наличии)"
-              class="h-[30px]  bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
+              @input="form.middleName = form.middleName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
+              class="h-[30px] bg-[#1a171d] text-[#9C9C9C] border border-[#404040] rounded-md px-[6px] focus:outline-none"
           />
         </div>
+
         <div class="form-group checkboxes flex flex-col [gap:12px]">
           <div class="flex items-center gap-[8px]">
             <div>
               <div
                   @click="form.checked.terms = !form.checked.terms"
                   :class="[
-        'w-[16px] h-[16px] rounded-[4px] flex items-center justify-center cursor-pointer border',
-        form.checked.terms ? 'bg-[#F4B44D] border-[#F4B44D]' : 'bg-transparent border-[#F4B44D]'
-      ]"
+          'w-[16px] h-[16px] rounded-[4px] flex items-center justify-center cursor-pointer border',
+          form.checked.terms ? 'bg-[#F4B44D] border-[#F4B44D]' : 'bg-transparent border-[#F4B44D]'
+        ]"
               >
                 <img
                     v-if="form.checked.terms"
@@ -249,12 +258,19 @@
               </div>
             </div>
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem] pt-[1rem]">
-              Я соглашаюсь с Условиями использования мини-приложения
+              Я соглашаюсь с
+              <a
+                  href="https://example.com/terms"
+                  target="_blank"
+                  class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2"
+              >
+                Условиями использования
+              </a>
+              мини-приложения
             </div>
           </div>
 
-
-          <div class="flex items-center gap-[8px]">
+        <div class="flex items-center gap-[8px]">
             <div>
               <div
                   @click="form.checked.pp = !form.checked.pp"
@@ -271,10 +287,19 @@
                 />
               </div>
             </div>
-            <div class="text-[#F5F5F5]  text-[13px] pl-[0.1rem]">
-              Я соглашаюсь с Условиями обработки ПД
+            <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem]">
+              Я соглашаюсь с
+              <a
+                  href="https://example.com"
+                  target="_blank"
+                  class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2 hover:text-[#F4B44D]"
+              >
+                Условиями обработки
+              </a>
+              ПД
             </div>
           </div>
+
 
         </div>
 
@@ -338,20 +363,34 @@ const togglePushes = () => {
 const route = useRoute()
 
 
-onMounted(() => {
-  if (route.query.city_id) {
-    form.value.city = String(route.query.city_id)
-  }
+onMounted(async () => {
+  try {
+    // Загружаем города
+    cities.value = await $fetch('/api/city')
+    rates.value = await $fetch<RatesResponse>('/api/rates')
 
-  if (route.query.branch_id) {
-    // сохраняем именно id
-    form.value.address = String(route.query.branch_id)
+    // Если есть query
+    if (route.query.city_id) {
+      form.value.city = String(route.query.city_id)
+      const city = cities.value.find(c => String(c.id) === String(route.query.city_id))
+      if (city) {
+        selectedCity.value = city
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка при инициализации:', error)
   }
 })
+
 
 const router = useRouter()
 
 async function submitOrder() {
+  if (errorMessage.value) {
+    alert(errorMessage.value)
+    return
+  }
+
   if (
       !form.value.city ||
       !form.value.address ||
@@ -380,7 +419,6 @@ async function submitOrder() {
 
     const payload = {
       type: mode.value, // "buy" или "sell"
-      user_id: 1, // TODO: заменить на реального пользователя
       branch_id: form.value.address,
       order_type_id: form.value.type,
       rate: rate,
@@ -499,10 +537,35 @@ const currentLimits = computed(() => {
 const toAmount = computed(() => {
   if (!fromAmount.value) return '0.00'
 
+  const rate = mode.value === 'buy' ? rates.value.buy : rates.value.sell
+  const commission = currentLimits.value?.rate || 0  // если не выбрали обменник, комиссия = 0
+
+  let result = 0
+
   if (mode.value === 'buy') {
-    return (fromAmount.value / rates.value.buy).toFixed(2)
+    // Покупка USDT за рубли → делим на курс и вычитаем комиссию
+    result = (fromAmount.value / rate) * (1 - commission)
   } else {
-    return (fromAmount.value * rates.value.sell).toFixed(2)
+    // Продажа USDT → умножаем на курс и вычитаем комиссию
+    result = (fromAmount.value * rate) * (1 - commission)
+  }
+
+  return result.toFixed(2)
+})
+
+const errorMessage = ref('')
+
+watch(fromAmount, (value) => {
+  if (!selectedType.value) {
+    errorMessage.value = ''
+    return
+  }
+
+  const limits = currentLimits.value
+  if (value < limits.min || value > limits.max) {
+    errorMessage.value = `Сумма должна быть от ${limits.min} до ${limits.max} RUB`
+  } else {
+    errorMessage.value = ''
   }
 })
 
@@ -518,25 +581,6 @@ const pasteFromClipboard = async () => {
   }
 }
 
-function resetForm() {
-  isSuccess.value = false
-  requestNumber.value = ''
-  form.value = {
-    city: '',
-    address: '',
-    branch_id: '',
-    type: '',
-    rub: null,
-    name: '',
-    contact: '',
-    wallet: '',
-    lastName: '',
-    firstName: '',
-    middleName: '',
-    checked: { terms: false, pp: false },
-  }
-  wallet.value = ''
-}
 
 function changeMode(newMode: 'buy' | 'sell') {
   mode.value = newMode
@@ -585,26 +629,32 @@ onMounted(async () => {
 
 watch(() => form.value.city, async (newCityId) => {
   if (!newCityId) return
+
+  // 🔄 сброс при смене города
+  form.value.address = ''
+  form.value.type = ''
+  selectedBranch.value = {}
+  types.value = []
+
+  // загружаем новые адреса
   branches.value = await $fetch(`/api/city/${newCityId}/branches`)
 
-  // если был branch_id в query, проверим совпадение
   if (route.query.branch_id) {
-    const branch = branches.value.find(
-        b => b.id === Number(route.query.branch_id)
-    )
+    const branch = branches.value.find(b => b.id === Number(route.query.branch_id))
     if (branch) {
       form.value.address = String(branch.id)
       selectedBranch.value = branch
     }
   }
 })
-
 watch(() => form.value.address, (newBranchId) => {
+  // 🔄 сброс типа заявки при смене адреса
+  form.value.type = ''
+  types.value = []
+
   if (newBranchId) {
     fetchOrderTypes(newBranchId)
     fetchBranch(newBranchId)
-  } else {
-    types.value = []
   }
 })
 </script>
