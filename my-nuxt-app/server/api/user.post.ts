@@ -5,6 +5,7 @@ interface UserRequestBody {
     last_name: string
     first_name: string
     middle_name?: string
+    phone: string
 }
 
 interface AuthResponse {
@@ -35,6 +36,7 @@ export default defineEventHandler(async (event): Promise<AuthResponse> => {
                 last_name: body.last_name,
                 first_name: body.first_name,
                 middle_name: body.middle_name,
+                phone: body.phone
             },
         })
 

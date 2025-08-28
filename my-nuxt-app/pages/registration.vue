@@ -45,6 +45,16 @@
               @input="form.middleName = form.middleName.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '')"
           />
 
+          <input
+              ref="phoneInput"
+              v-model="form.phone"
+              type="tel"
+              placeholder="Номер телефона*"
+              class="input"
+              required
+              maxlength="18"
+              @input="formatPhone"
+          />
           <div class="flex items-center gap-[8px]">
             <div>
               <div
@@ -65,7 +75,7 @@
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem]">
               Я соглашаюсь с
               <a
-                  href="https://example.com/terms"
+                  href="https://cryptogex.vip/page/user-agreement/"
                   target="_blank"
                   class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2"
               >
@@ -86,34 +96,104 @@
   </div>
 </template>
 <script setup>
-import { reactive, ref } from 'vue'
-import AppHeader from '@/components/AppHeader.vue'
+import { reactive, ref, nextTick } from 'vue'
 
-// кука для токена
+
 const token = useCookie('access_token', {
   sameSite: 'lax',
   path: '/',
 })
 
+const phoneInput = ref(null)
+const lastFormatted = ref('')
+
+const digitsToFormatted = (d) => {
+  if (!d) return ''
+
+  if (d.startsWith('8')) {
+    d = '7' + d.slice(1)
+  }
+  else if (!d.startsWith('7')) {
+    d = '7' + d
+  }
+
+  d = d.slice(0, 11)
+
+  let out = '+' + d[0]
+  if (d.length > 1) out += ' (' + d.slice(1, 4)
+  if (d.length >= 4) out += ') ' + d.slice(4, 7)
+  if (d.length >= 7) out += '-' + d.slice(7, 9)
+  if (d.length >= 9) out += '-' + d.slice(9, 11)
+  return out
+}
+
+
+const caretPosForDigits = (formatted, n) => {
+  if (n <= 0) return 0
+  let cnt = 0
+  for (let i = 0; i < formatted.length; i++) {
+    if (/\d/.test(formatted[i])) cnt++
+    if (cnt === n) return i + 1
+  }
+  return formatted.length
+}
+const formatPhone = async (e) => {
+  const el = e?.target || phoneInput.value
+  if (!el) return
+  if (e?.isComposing) return
+
+  const raw = el.value
+  const start = el.selectionStart ?? raw.length
+  const digitsLeft = raw.slice(0, start).replace(/\D/g, '').length
+
+  let digits = raw.replace(/\D/g, '')
+  if (!digits) {
+    form.phone = ''
+    lastFormatted.value = ''
+    return
+  }
+
+  const formatted = digitsToFormatted(digits)
+  form.phone = formatted
+
+  await nextTick()
+  let newPos = caretPosForDigits(formatted, digitsLeft)
+  if (newPos <= 2) newPos = formatted.length
+
+  try {
+    phoneInput.value?.setSelectionRange(newPos, newPos)
+  } catch {}
+  lastFormatted.value = formatted
+}
 
 
 const form = reactive({
   lastName: '',
   firstName: '',
   middleName: '',
+  phone: '',
   checked: { terms: false, pp: false },
 })
+
 const submitForm = async () => {
+  const digitsPhone = form.phone.replace(/\D/g, '')
+  if (digitsPhone.length !== 11 || !digitsPhone.startsWith('7')) {
+    alert('Введите корректный номер телефона (+7 XXX XXX-XX-XX)')
+    return
+  }
+
   if (!form.checked.pp) {
     alert('Необходимо согласиться с условиями использования')
     return
   }
+
 
   if (!import.meta.client) return
 
   const tg = window.Telegram?.WebApp
   tg?.ready()
   const initData = tg?.initData ?? '';
+
 
 
   if (!initData) {
@@ -131,6 +211,7 @@ const submitForm = async () => {
         last_name: form.lastName,
         first_name: form.firstName,
         middle_name: form.middleName,
+        phone: digitsPhone,
       },
       throw: false,
     })

@@ -262,7 +262,7 @@
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem] pt-[1rem]">
               Я соглашаюсь с
               <a
-                  href="https://example.com/terms"
+                  href="https://cryptogex.vip/page/user-agreement/"
                   target="_blank"
                   class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2"
               >
@@ -292,7 +292,7 @@
             <div class="text-[#F5F5F5] text-[13px] pl-[0.1rem]">
               Я соглашаюсь с
               <a
-                  href="https://example.com"
+                  href="https://cryptogex.vip/page/privacy-policy/"
                   target="_blank"
                   class="text-[#F5F5F5] underline decoration-[#F4B44D] underline-offset-2 hover:text-[#F4B44D]"
               >
