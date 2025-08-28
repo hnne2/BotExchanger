@@ -20,15 +20,15 @@
           </div>
 
           <div class="action-buttons">
-            <ActionButton icon="/img/pokupka_prodaja.svg" label="Покупка и продажа"  to="/exchange"/>
-            <MyOrders icon="/img/moi_zayavki.svg" label="Мои заявки" to="/orders" />
+            <ActionButton icon="/img/pokupka_prodaja.png" label="Покупка и продажа"  to="/exchange"/>
+            <MyOrders icon="/img/moi_zayavki.png" label="Мои заявки" to="/orders" />
           </div>
 
           <div class="menu-items">
-            <MenuItem icon="/img/kurs_komissii.svg" label="Курс и комиссии" to="/course_and_commission" />
-            <MenuItem icon="/img/adressObmennika.svg" label="Адреса обменников" to="/adreses" />
-            <MenuItem icon="/img/referalProgram.svg" label="Реферальная программа" soon />
-            <MenuItem icon="/img/podderjka.svg" label="Поддержка" to="https://t.me/garex_support" />
+            <MenuItem icon="/img/kurs_komissii.png" label="Курс и комиссии" to="/course_and_commission" />
+            <MenuItem icon="/img/adressObmennika.png" label="Адреса обменников" to="/adreses" />
+            <MenuItem icon="/img/referalProgram.png" label="Реферальная программа" soon />
+            <MenuItem icon="/img/podderjka.png" label="Поддержка" to="https://t.me/garex_support" />
           </div>
         </div>
       </div>

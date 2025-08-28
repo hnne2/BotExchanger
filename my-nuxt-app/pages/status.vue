@@ -19,7 +19,7 @@
     <div class="rounded-[12px] p-[8px] shadow-lg ">
       <!-- Если успех -->
       <template v-if="success">
-        <img src="/img/galochka.svg" class="w-[80px] h-[80px] mr-[12px]" />
+        <img src="/img/galochka.png" class="w-[80px] h-[80px] mr-[12px]" />
 
         <div class="flex items-center mb-[24px]">
           <div class="text-left">
@@ -48,7 +48,7 @@
 
       <!-- Если ошибка -->
       <template v-else>
-        <img src="/img/error.svg" class="w-[80px] h-[80px] mr-[12px]" />
+        <img src="/img/error.png" class="w-[80px] h-[80px] mr-[12px]" />
 
         <div class="flex items-center mb-[24px]">
           <div class="text-left">

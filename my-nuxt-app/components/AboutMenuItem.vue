@@ -29,6 +29,6 @@ const props = defineProps({
 })
 
 const iconSrc = computed(() =>
-    props.iconType === 'bird' ? '/img/telegram.svg' : '/img/arrow_right.svg'
+    props.iconType === 'bird' ? '/img/telegram.svg' : '/img/arrow_right.png'
 )
 </script>

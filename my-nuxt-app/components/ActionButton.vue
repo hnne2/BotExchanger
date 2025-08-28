@@ -6,7 +6,7 @@
     <img
         :src="icon"
         alt="icon"
-        class="w-10 h-10 mb-2 object-contain"
+        class="w-[4rem] mb-2 object-contain"
     />
     <div class="text-[15px] font-semibold text-center leading-[140%] tracking-normal">{{ label }}</div>
   </NuxtLink>

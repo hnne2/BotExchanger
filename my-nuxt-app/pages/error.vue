@@ -17,7 +17,7 @@
         :style="{ backgroundImage: `url('/img/bg_error.svg')` }"
     >
       <div class="rounded-[12px] p-[8px] shadow-lg">
-        <img src="/img/error.svg" class="w-[80px] h-[80px] mr-[12px]" />
+        <img src="/img/error.png" class="w-[80px] h-[80px] mr-[12px]" />
 
         <div class="flex items-center mb-[24px]">
           <div class="text-left">

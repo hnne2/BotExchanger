@@ -16,7 +16,7 @@
     </div>
     <img
         v-if="!disabled"
-        src="/img/arrow_right.svg"
+        src="/img/arrow_right.png"
         alt="arrow"
         class="w-[12px] h-[12px]"
     />

@@ -20,11 +20,11 @@
       <section class="">
         <p class="font-vela font-normal text-[#999] text-[14px] mb-[16px] ml-[16px]">Основное</p>
         <div>
-          <MenuSection title="Купить и продать" icon="/img/pokupka_prodaja.svg" :disabled="false" :link="'/exchange'" />
-          <MenuSection title="Мои заявки" icon="/img/moi_zayavki.svg" :disabled="false" :link="'/orders'" />
-          <MenuSection title="Адреса обменников" icon="/img/adressObmennika.svg" :disabled="false" :link="'/adreses'"/>
-          <MenuSection title="Курс и комиссии" icon="/img/kurs_komissii.svg" :disabled="false" :link="'/course_and_commission'"/>
-          <MenuSection title="Личные данные" icon="/img/licni_danii.svg" :disabled="false" :link="'/me'" />
+          <MenuSection title="Купить и продать" icon="/img/pokupka_prodaja.png" :disabled="false" :link="'/exchange'" />
+          <MenuSection title="Мои заявки" icon="/img/moi_zayavki.png" :disabled="false" :link="'/orders'" />
+          <MenuSection title="Адреса обменников" icon="/img/adressObmennika.png" :disabled="false" :link="'/adreses'"/>
+          <MenuSection title="Курс и комиссии" icon="/img/kurs_komissii.png" :disabled="false" :link="'/course_and_commission'"/>
+          <MenuSection title="Личные данные" icon="/img/licni_danii.png" :disabled="false" :link="'/me'" />
         </div>
       </section>
 
@@ -32,9 +32,9 @@
       <section class="mb-[1rem]">
         <p class="text-[#999] text-[14px] mt-[30px]  ml-[16px]">Скоро</p>
         <div>
-          <MenuSection title="Реферальная программа" icon="/img/referalProgram.svg" :disabled="true"  />
-          <MenuSection title="Мои активы" icon="/img/moi_activi_grey.svg" :disabled="true" />
-          <MenuSection title="Онлайн обмен" icon="/img/online_obmen_grey.svg" :disabled="true" />
+          <MenuSection title="Реферальная программа" icon="/img/referalProgram.png" :disabled="true"  />
+          <MenuSection title="Мои активы" icon="/img/moi_activi_grey.png" :disabled="true" />
+          <MenuSection title="Онлайн обмен" icon="/img/online_obmen_grey.png" :disabled="true" />
         </div>
       </section>
 

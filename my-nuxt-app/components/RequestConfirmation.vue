@@ -4,7 +4,7 @@
 
       <!-- Иконка -->
       <div class="flex justify-center mb-[24px]">
-        <img src="/img/galochka.svg" class="w-[48px] h-[48px]" />
+        <img src="/img/galochka.png" class="w-[48px] h-[48px]" />
       </div>
 
       <!-- Текст -->
