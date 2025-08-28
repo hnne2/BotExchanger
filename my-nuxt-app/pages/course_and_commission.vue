@@ -3,7 +3,7 @@
 
     <div class=" flex flex-col">
       <AppHeader
-          title="Курс и комиссия"
+          title="Комиссия"
           @toggle-menu="toggleMenu"
           @toggle-pushes="togglePushes"
       />
@@ -93,7 +93,7 @@
         <p class="text-left text-[13px] text-[#9C9C9C] pt-[5px]">Выберите город и адрес обменника, чтобы увидеть подробную информацию. </p>
       </div>
 
-      <div v-if="orderTypes.length > 0" class="mt-[1rem] flex flex-col gap-[1rem]">
+      <div v-if="orderTypes.length > 0" class="mt-[1rem] flex flex-col gap-[0.6rem]">
         <div
             v-for="type in orderTypes"
             :key="type.id"
@@ -105,29 +105,29 @@
             {{ type.title }}
           </h3>
           <div class="bg-[#120E1447] rounded-[12px] px-[1rem] py-[0.75rem] text-[14px] mb-[12px]">
-            <!-- Заголовок -->
-            <div class="text-left text-[#F5F5F5] text-[14px] font-medium mb-[0.75rem]">
-              Комиссия
+            <div class="flex flex-col gap-4">
+              <!-- Покупка -->
+              <div class="flex flex-col">
+                <div class="text-[#F5F5F5] text-sm py-[0.2rem]">Комиссия на покупку</div>
+                <div class="text-[#F4B44D] text-[20px] font-semibold py-[0.2rem]">
+                  {{ type.buy?.rate ?? '-' }}%
+                </div>
+                <div class="text-[#9C9C9C] text-[11px] py-[0.2rem]">
+                  Лимит: от {{ type.buy?.min ?? '-' }} RUB до {{ type.buy?.max ?? '-' }} RUB
+                </div>
+              </div>
+              <!-- Продажа -->
+              <div class="flex flex-col">
+                <div class="text-[#F5F5F5] text-sm py-[0.2rem]">Комиссия на продажу</div>
+                <div class="text-[#F4B44D] text-[20px] font-semibold py-[0.3rem]">
+                  {{ type.sell?.rate ?? '-' }}%
+                </div>
+                <div class="text-[#9C9C9C] text-[11px] py-[0.1rem]">
+                  Лимит: от {{ type.sell?.min ?? '-' }} RUB до {{ type.sell?.max ?? '-' }} RUB
+                </div>
+              </div>
             </div>
 
-            <!-- Комиссии -->
-            <div class="relative h-[60px]">
-              <!-- Покупка (в начале) -->
-              <div class="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                <div class="text-[#F4B44D] text-[20px] font-semibold leading-none">
-                  {{ type.buy?.rate ?? '-' }}
-                </div>
-                <div class="text-[#C1BFC6] mt-[4px]">Покупка</div>
-              </div>
-
-              <!-- Продажа (чуть правее центра) -->
-              <div class="absolute left-[55%] top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                <div class="text-[#F4B44D] text-[20px] font-semibold leading-none">
-                  {{ type.sell?.rate ?? '-' }}
-                </div>
-                <div class="text-[#C1BFC6] mt-[4px]">Продажа</div>
-              </div>
-            </div>
           </div>
 
 

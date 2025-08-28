@@ -331,6 +331,11 @@ const isTypeDropdownOpen = ref(false)
 
 const selectedCity = ref(null)
 
+const user = ref({
+  name: '',
+  surname: '',
+  patronymic: ''
+})
 
 const toggleCities = () => isCityDropdownOpen.value = !isCityDropdownOpen.value
 const toggleBranches = () => isBranchDropdownOpen.value = !isBranchDropdownOpen.value
@@ -368,8 +373,16 @@ const route = useRoute()
 onMounted(async () => {
   try {
     // Загружаем города
+
     cities.value = await $fetch('/api/city')
     rates.value = await $fetch<RatesResponse>('/api/rates')
+    const userData = await $fetch('/api/user', { method: 'GET' })
+    if (userData) {
+      user.value = userData
+      form.value.lastName = userData.surname || ''
+      form.value.firstName = userData.name || ''
+      form.value.middleName = userData.patronymic || ''
+    }
 
     // Если есть query
     if (route.query.city_id) {
@@ -555,26 +568,27 @@ const toAmount = computed(() => {
 const errorMessage = ref('')
 
 watch(fromAmount, (value) => {
-  if (!selectedType.value) {
-    errorMessage.value = ''
-    return
-  }
+  if (!types.value.length) return
 
-  const limits = currentLimits.value
+  // вычисляем сумму в рублях для проверки
   let amountInRub = 0
-
   if (mode.value === 'buy') {
     amountInRub = value
   } else {
     amountInRub = value * rates.value.sell
   }
 
-  if (amountInRub < limits.min || amountInRub > limits.max) {
-    errorMessage.value = `Сумма должна быть от ${limits.min} до ${limits.max} RUB`
-  } else {
-    errorMessage.value = ''
+  // ищем первый подходящий тип заявки
+  const matchedType = types.value.find(type => {
+    const limits = mode.value === 'sell' ? type.sell : type.buy
+    return amountInRub >= limits.min && amountInRub <= limits.max
+  })
+
+  if (matchedType) {
+    form.value.type = matchedType.id
   }
 })
+
 
 
 /** =========================

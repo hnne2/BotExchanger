@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const tg = window.Telegram?.WebApp ?? null
     tg?.ready()
 
-         const initData = tg?.initData ?? '';
+     const initData = tg?.initData ?? '';
 
     const fetchToken = async () => {
         if (!initData) return false

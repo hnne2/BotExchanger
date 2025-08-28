@@ -109,9 +109,14 @@
           <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">Адрес обменника</span>
           <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.address }}</span>
         </div>
-        <div class="flex justify-between">
+        <div class="flex justify-between border-b border-[#404040] pb-[8px]">
           <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">ФИО получателя</span>
           <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.fullName }}</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="text-[14px] text-[#9C9C9C] w-1/2 text-left">Кошелек</span>
+          <span class="text-[14px] text-[#F5F5F5] w-1/2 text-left">{{ order.wallet || 'Не указан' }}</span>
         </div>
 
         <!-- Кнопка -->
