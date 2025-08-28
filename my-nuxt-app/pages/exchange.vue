@@ -744,7 +744,5 @@ watch(() => form.value.address, (newBranchId) => {
   border-radius: 8px;
   cursor: pointer;
 }
-.submit-btn:hover {
-  background: #2673cc;
-}
+
 </style>

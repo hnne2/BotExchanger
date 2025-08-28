@@ -2,7 +2,7 @@
   <component
       :is="!disabled && link ? 'a' : 'div'"
       :href="!disabled ? link : null"
-      class=" no-underline bg-[#120E1447] flex items-center justify-between px-[16px] py-[12px] mx-[16px] rounded-xl hover:bg-[#2a242e] transition-all mb-[8px]"
+      class=" no-underline bg-[#120E1447] flex items-center [border-radius:8px] justify-between px-[16px] py-[12px] mx-[16px] rounded-xl hover:bg-[#2a242e] transition-all mb-[8px]"
       :class="{ 'opacity-50 pointer-events-none': disabled }"
   >
     <span class="text-[#F5F5F5] text-[14px]">{{ title }}</span>

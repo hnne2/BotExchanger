@@ -21,7 +21,7 @@
         <p class="text-[16px] font-semibold text-[#F5F5F5]">
           Заявка {{ order.id }}
         </p>
-        <p class="text-[16px] font-semibold text-[#F4B44D]">
+        <p class="text-[16px] font-semibold text-[#F4B44D] text-right break-words max-w-[60%]">
           <template v-if="order.type === 'buy'">
             {{ order.amount }} ₽ / {{ order.crypto_amount }} USDT
           </template>
