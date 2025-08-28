@@ -400,44 +400,55 @@ onMounted(async () => {
 
 const router = useRouter()
 
-async function submitOrder() {
+
+
+  async function submitOrder() {
   if (errorMessage.value) {
     alert(errorMessage.value)
     return
   }
 
   if (
-      !form.value.city ||
-      !form.value.address ||
-      !form.value.type ||
-      !fromAmount.value ||
-      !wallet.value ||
-      !form.value.lastName ||
-      !form.value.firstName ||
-      !form.value.checked.terms ||
-      !form.value.checked.pp
+    !form.value.city ||
+    !form.value.address ||
+    !form.value.type ||
+    !fromAmount.value ||
+    !wallet.value ||
+    !form.value.lastName ||
+    !form.value.firstName ||
+    !form.value.checked.terms ||
+    !form.value.checked.pp
   ) {
     alert('Пожалуйста, заполните все обязательные поля и согласитесь с условиями')
     return
   }
 
   try {
-    // вычисляем значения
     const rate = mode.value === 'buy' ? rates.value.buy : rates.value.sell
-    const cryptoAmount =
-        mode.value === 'buy'
-            ? fromAmount.value / rate
-            : fromAmount.value * rate
+
+    let amountRub = 0
+    let amountCrypto = 0
+
+    if (mode.value === 'buy') {
+      // пользователь вводит рубли, получает USDT
+      amountRub = fromAmount.value
+      amountCrypto = fromAmount.value / rate
+    } else {
+      // пользователь вводит USDT, получает рубли
+      amountCrypto = fromAmount.value
+      amountRub = fromAmount.value * rate
+    }
 
     const commission = currentLimits.value.rate
-    const commissionAmount = fromAmount.value * (commission / 100)
+    const commissionAmount = amountRub * (commission / 100)
+
     const payload = {
       type: mode.value, // "buy" или "sell"
       branch_id: form.value.address,
       order_type_id: form.value.type,
       rate: rate,
-      amount: fromAmount.value,
-      crypto_amount: Number(cryptoAmount.toFixed(6)),
+      amount: Number(amountRub.toFixed(2)),          // ВСЕГДА рубли
+      crypto_amount: Number(amountCrypto.toFixed(6)), // ВСЕГДА USDT
       commission: commission,
       commission_amount: Number(commissionAmount.toFixed(2)),
       wallet: wallet.value,
@@ -459,14 +470,9 @@ async function submitOrder() {
     })
   } catch (err) {
     console.error('Ошибка при создании заявки:', err)
-
-    router.push({
-      path: '/status',
-      query: { success: 'false' },
-    })
+    router.push({ path: '/status', query: { success: 'false' } })
   }
 }
-
 
 
 interface RatesResponse {
